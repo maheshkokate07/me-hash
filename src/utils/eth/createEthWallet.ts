@@ -1,16 +1,17 @@
 import * as bip39 from 'bip39';
 import { HDNodeWallet } from "ethers";
+import type { Wallet } from '../../slices/appSlice';
 
-export const createEthWallet = (mnemonic: string, accountIdx: number = 0) => {
+export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet => {
      if (!bip39.validateMnemonic(mnemonic)) {
           throw new Error("Invalid mnemonic");
      }
 
-     const path = `m/44'/60'/0'/0/${accountIdx}`;
+     const path = `m/44'/60'/0'/0/${walletIdx}`;
      const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, path);
 
      return {
-          accountIdx,
+          walletIdx,
           type: "ETH",
           address: wallet.address,
           privateKey: wallet.privateKey,

@@ -7,14 +7,18 @@ export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet
           throw new Error("Invalid mnemonic");
      }
 
-     const path = `m/44'/60'/0'/0/${walletIdx}`;
-     const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, path);
+     try {
+          const path = `m/44'/60'/0'/0/${walletIdx}`;
+          const wallet = HDNodeWallet.fromPhrase(mnemonic, undefined, path);
 
-     return {
-          walletIdx,
-          type: "ETH",
-          address: wallet.address,
-          privateKey: wallet.privateKey,
-          path: path
+          return {
+               walletIdx,
+               type: "ETH",
+               address: wallet.address,
+               privateKey: wallet.privateKey,
+               path: path
+          }
+     } catch (err: any) {
+          throw err;
      }
 }

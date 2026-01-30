@@ -4,15 +4,15 @@ import {
      DropdownMenuContent,
      DropdownMenuGroup,
      DropdownMenuItem,
+     DropdownMenuSeparator,
      DropdownMenuTrigger,
-     DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { setActiveWalletIdx } from "@/slices/appSlice"
-import { ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown, Plus } from "lucide-react"
 
-export function WalletDropdown() {
+export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
      const dispatch = useAppDispatch()
 
      const { accounts, activeAccountIdx, activeWalletType, activeWalletIdx } = useAppSelector(state => state.app);
@@ -33,7 +33,7 @@ export function WalletDropdown() {
                               className="h-full px-3 rounded-none flex items-center hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                          >
                               <span className="h-6 flex items-center justify-center gap-1.5">
-                                   {activeWalletIdx !== -1 ? `Wallet ${activeWalletIdx}` : `No ${activeWalletType} Accounts`}
+                                   {activeWalletIdx !== -1 ? `Wallet ${activeWalletIdx}` : `No ${activeWalletType} Wallets`}
                                    {activeWalletIdx !== -1 && <ChevronsUpDown className="text-gray-500" />}
                               </span>
                          </Button>
@@ -66,6 +66,24 @@ export function WalletDropdown() {
                                    )
                               })}
                          </DropdownMenuGroup>
+
+                         <DropdownMenuSeparator />
+
+                         <DropdownMenuItem
+                              onSelect={(e) => {
+                                   e.preventDefault();
+                                   onAddWallet();
+                              }}
+                              className="flex items-center gap-3 font-medium cursor-pointer"
+                         >
+                              <Avatar className="h-9 w-9">
+                                   <AvatarFallback className="flex items-center justify-center">
+                                        <Plus className="h-4 w-4" />
+                                   </AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm">Add {activeWalletType} Wallet</span>
+                         </DropdownMenuItem>
+
                     </DropdownMenuContent>
                </DropdownMenu>
           </div>

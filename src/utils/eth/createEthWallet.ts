@@ -16,7 +16,10 @@ export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet
                type: "ETH",
                address: wallet.address,
                privateKey: wallet.privateKey,
-               path: path
+               path: path,
+               balance: 0,
+               balanceUsd: 0,
+               lastUpdated: Date.now()
           }
      } catch (err: any) {
           throw err;

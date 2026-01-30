@@ -3,6 +3,8 @@ import * as bip39 from 'bip39';
 import { createEthWallet } from "../utils/eth/createEthWallet";
 import { createSolWallet } from "../utils/sol/createSolWallet";
 import { importWalletsByMnemonic } from "../utils/wallets/importByMnumonic";
+import { getEthBalance } from "@/utils/eth/getEthBalance";
+import { getSolBalance } from "@/utils/sol/getSolBalance";
 
 type walletType = 'SOL' | 'ETH';
 
@@ -12,6 +14,11 @@ export interface Wallet {
     address: string;
     privateKey: string;
     path: string;
+
+    balance: number;
+    balanceUsd: number;
+    lastUpdated: number;
+    // isLoading: boolean;
 }
 
 interface Account {
@@ -33,7 +40,7 @@ interface AppState {
 const initialState: AppState = {
     accounts: [],
     activeAccountIdx: -1,
-    activeWalletType: 'SOL',
+    activeWalletType: 'ETH',
     activeWalletIdx: -1
 }
 
@@ -149,7 +156,36 @@ export const recoverWallets = createAsyncThunk(
             const wallets = await importWalletsByMnemonic(mnemonic);
             return { accountIdx, name, wallets, create, mnemonic, createdAt: Date.now() };
         } catch (err) {
+            console.error("Error recovering wallets: ", err);
             return rejectWithValue("Failed to recover wallets");
+        }
+    }
+)
+
+export const fetchBalance = createAsyncThunk(
+    "app/fetchBalance",
+    async (payload: { walletType: walletType, walletAddress: string }, { rejectWithValue }) => {
+        const { walletType, walletAddress } = payload;
+
+        try {
+            let balanceData;
+
+            if (walletType === 'ETH') {
+                balanceData = await getEthBalance(walletAddress);
+            } else if (walletType === 'SOL') {
+                balanceData = await getSolBalance(walletAddress);
+            }
+
+            return {
+                walletType,
+                walletAddress,
+                balance: balanceData?.balance,
+                balanceUsd: balanceData?.balanceUsd,
+                lastUpdated: Date.now()
+            }
+        } catch (err) {
+            console.error("Error fetching balance: ", err);
+            return rejectWithValue("Failed to fetch balance");
         }
     }
 )
@@ -196,6 +232,7 @@ const appSlice = createSlice({
             .addCase(createAccount.fulfilled, (state, action) => {
                 state.accounts.push(action.payload)
                 state.activeAccountIdx = action.payload.accountIdx;
+                state.activeWalletIdx = -1;
             })
             .addCase(addEthWallet.fulfilled, (state, action) => {
                 if (!action.payload) return;
@@ -208,6 +245,7 @@ const appSlice = createSlice({
 
                 account.mnemonic = mnemonic;
                 account.ethWallets.push(wallet);
+                state.activeWalletIdx = wallet.walletIdx;
             })
             .addCase(addSolWallet.fulfilled, (state, action) => {
                 if (!action.payload) return;
@@ -220,6 +258,7 @@ const appSlice = createSlice({
 
                 account.mnemonic = mnemonic;
                 account.solWallets.push(wallet);
+                state.activeWalletIdx = wallet.walletIdx;
             })
             .addCase(recoverWallets.fulfilled, (state, action) => {
                 if (!action.payload) return;
@@ -247,6 +286,23 @@ const appSlice = createSlice({
                 }
 
                 state.activeAccountIdx = accountIdx;
+                state.activeWalletIdx = 0;
+            })
+            .addCase(fetchBalance.fulfilled, (state, action) => {
+                if (!action.payload) return;
+                const { walletType, walletAddress, balance, balanceUsd, lastUpdated } = action.payload;
+
+                for (let account of state.accounts) {
+                    const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
+
+                    for (let wallet of wallets) {
+                        if (wallet.address === walletAddress) {
+                            wallet.balance = balance ?? 0;
+                            wallet.balanceUsd = balanceUsd ?? 0;
+                            wallet.lastUpdated = lastUpdated;
+                        }
+                    }
+                }
             })
     }
 })

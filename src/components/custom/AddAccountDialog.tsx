@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
      Dialog,
@@ -7,19 +7,29 @@ import {
      DialogFooter,
      DialogHeader,
      DialogTitle,
-     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAppDispatch } from "@/store/hooks";
 import { createAccount, recoverWallets } from "@/slices/appSlice";
-import { EraserIcon, Eye, EyeOff, Plus } from "lucide-react";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { ClipboardPaste, EraserIcon, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { AppSpinner } from "./Spinner";
 
-export function AddAccountDialog() {
+type AddAccountDialogProps = {
+     open: boolean;
+     onOpenChange: (open: boolean) => void;
+     recoverOnly?: boolean;
+     addOnly?: boolean;
+};
+
+export function AddAccountDialog({
+     open,
+     onOpenChange,
+     recoverOnly,
+     addOnly,
+}: AddAccountDialogProps) {
      const dispatch = useAppDispatch();
 
      const [name, setName] = useState("");
@@ -27,29 +37,28 @@ export function AddAccountDialog() {
      const [mnemonic, setMnemonic] = useState(Array(12).fill(""));
      const [hidden, setHidden] = useState(true);
      const [creating, setCreating] = useState(false);
-     const [open, setOpen] = useState(false);
 
-     // Handle pasting all 12 words at once
-     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-          const paste = e.clipboardData.getData("text").trim().split(/\s+/);
-          if (paste.length === 12) {
-               setMnemonic(paste);
-               e.preventDefault();
+     useEffect(() => {
+          if (open) {
+               setName("");
+               setMnemonic(Array(12).fill(""));
+               setHidden(true);
+               if (recoverOnly) {
+                    setRecover(true);
+               } else if (addOnly) {
+                    setRecover(false);
+               } else {
+                    setRecover(false);
+               }
           }
-     };
-
-     const resetDialogState = () => {
-          setName("");
-          setRecover(false);
-          setMnemonic(Array(12).fill(""));
-     };
+     }, [open, recoverOnly, addOnly]);
 
      const handleAdd = async () => {
           setCreating(true);
 
           try {
-               if (recover) {
-                    if (mnemonic.some(w => !w.trim())) {
+               if (recoverOnly || (!addOnly && recover)) {
+                    if (mnemonic.some((w) => !w.trim())) {
                          throw new Error("Please enter all 12 mnemonic words");
                     }
 
@@ -61,91 +70,131 @@ export function AddAccountDialog() {
                               name: name.trim() || undefined,
                          })
                     ).unwrap();
-               } else {
-                    await dispatch(
-                         createAccount({ name: name.trim() || undefined })
-                    ).unwrap();
+               } else if (addOnly || (!recoverOnly && !recover)) {
+                    await dispatch(createAccount({ name: name.trim() || undefined })).unwrap();
                }
 
-               resetDialogState();
-               setOpen(false);
+               onOpenChange(false);
           } catch (err) {
-               console.error(err);
+               console.error("Failed to create account: ", err);
           } finally {
                setCreating(false);
           }
      };
 
+     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+          const paste = e.clipboardData.getData("text").trim().split(/\s+/);
+          if (paste.length === 12) {
+               setMnemonic(paste);
+               e.preventDefault();
+          }
+     };
+
+     const pasteMnemonic = async () => {
+          try {
+               const text = await navigator.clipboard.readText();
+               const words = text.trim().split(/\s+/);
+
+               if (words.length === 12) {
+                    setMnemonic(words);
+                    alert("Mnemonic pasted successfully!");
+               } else {
+                    alert("Clipboard does not contain exactly 12 words.");
+               }
+          } catch (err) {
+               console.error("Failed to read clipboard: ", err);
+               alert("Unable to read clipboard. Please try manually.");
+          }
+     };
+
      const clearMnemonic = () => setMnemonic(Array(12).fill(""));
-     const hideMnemonic = () => setHidden(prev => !prev);
+     const toggleHidden = () => setHidden((prev) => !prev);
+
+     let title = "Add new account";
+     let buttonText = "Add";
+
+     if (recoverOnly) {
+          title = "Recover existing wallets";
+          buttonText = "Recover";
+     } else if (addOnly) {
+          title = "Add new account";
+          buttonText = "Add";
+     } else {
+          title = recover ? "Recover existing wallets" : "Add new account";
+          buttonText = recover ? "Recover" : "Add";
+     }
 
      return (
-          <Dialog open={open} onOpenChange={setOpen}>
-               {/* Trigger */}
-               <DialogTrigger asChild>
-                    <Button variant="ghost" className="w-full justify-start px-2 py-3 gap-3 text-gray-800 cursor-pointer">
-                         <Avatar className="h-8 w-8">
-                              <AvatarFallback className="flex items-center justify-center">
-                                   <Plus className="h-4 w-4" />
-                              </AvatarFallback>
-                         </Avatar>
-                         <span className="text-sm">Add Account</span>
-                    </Button>
-               </DialogTrigger>
-
-               {/* Content */}
+          <Dialog open={open} onOpenChange={onOpenChange}>
                <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
-                         <DialogTitle>Add new account</DialogTitle>
+                         <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
                     </DialogHeader>
 
                     <div className="grid gap-4 py-2">
-                         {/* Account Name */}
-                         <div className="grid gap-2">
-                              <Label htmlFor="account-name">Account name</Label>
-                              <Input
-                                   id="account-name"
-                                   placeholder="Enter account name"
-                                   value={name}
-                                   onChange={(e) => setName(e.target.value)}
-                                   autoFocus
-                              />
-                         </div>
+                         {/* Account Name Input */}
+                         {!recoverOnly && !addOnly && (
+                              <div className="grid gap-2">
+                                   <Label htmlFor="account-name">Account name</Label>
+                                   <Input
+                                        id="account-name"
+                                        placeholder="Enter account name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        autoFocus
+                                   />
+                              </div>
+                         )}
+
+                         {/* Account Name input for addOnly */}
+                         {addOnly && (
+                              <div className="grid gap-2">
+                                   <Label htmlFor="account-name">Account name</Label>
+                                   <Input
+                                        id="account-name"
+                                        placeholder="Enter account name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        autoFocus
+                                   />
+                              </div>
+                         )}
 
                          {/* Recover Wallet Switch */}
-                         <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                   <span>Recover existing wallets</span>
-                                   <Switch id="recover-switch" checked={recover} onCheckedChange={setRecover} className="cursor-pointer" />
+                         {!recoverOnly && !addOnly && (
+                              <div className="flex items-center justify-between">
+                                   <div className="flex items-center gap-2">
+                                        <span>Recover existing wallets</span>
+                                        <Switch
+                                             id="recover-switch"
+                                             checked={recover}
+                                             onCheckedChange={setRecover}
+                                             className="cursor-pointer"
+                                        />
+                                   </div>
+                                   {recover && (
+                                        <MnemonicControls
+                                             pasteMnemonic={pasteMnemonic}
+                                             clearMnemonic={clearMnemonic}
+                                             hidden={hidden}
+                                             toggleHidden={toggleHidden}
+                                        />
+                                   )}
                               </div>
-                              {recover && <div className="flex items-center gap-2 justify-end">
-                                   <Tooltip>
-                                        <TooltipTrigger asChild>
-                                             <Button variant="outline" className="cursor-pointer" onClick={clearMnemonic}>
-                                                  <EraserIcon />
-                                             </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                             Clear
-                                        </TooltipContent>
-                                   </Tooltip>
+                         )}
 
-                                   {/* Hide/Show button with tooltip */}
-                                   <Tooltip>
-                                        <TooltipTrigger asChild>
-                                             <Button variant="outline" className="cursor-pointer" onClick={hideMnemonic}>
-                                                  {hidden ? <Eye /> : <EyeOff />}
-                                             </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                             {hidden ? "Show" : "Hide"}
-                                        </TooltipContent>
-                                   </Tooltip>
-                              </div>}
-                         </div>
+                         {/* Mnemonic inputs for recoverOnly */}
+                         {recoverOnly && (
+                              <MnemonicControls
+                                   pasteMnemonic={pasteMnemonic}
+                                   clearMnemonic={clearMnemonic}
+                                   hidden={hidden}
+                                   toggleHidden={toggleHidden}
+                              />
+                         )}
 
-                         {/* 12-word mnemonic inputs */}
-                         {recover && (
+                         {/* Mnemonic Inputs */}
+                         {(recoverOnly || recover) && !addOnly && (
                               <>
                                    <div className="grid grid-cols-3 gap-2">
                                         {mnemonic.map((word, idx) => (
@@ -160,12 +209,12 @@ export function AddAccountDialog() {
                                                   }}
                                                   className="text-center"
                                                   onPaste={handlePaste}
-                                                  placeholder={`Word ${idx + 1}`}
+                                                  placeholder={`${idx + 1}`}
                                              />
                                         ))}
                                    </div>
                                    <p className="text-xs text-muted-foreground">
-                                        Type or paste your 12 word mnumonic phrase.
+                                        Type or paste your 12 word mnemonic phrase.
                                    </p>
                               </>
                          )}
@@ -177,11 +226,66 @@ export function AddAccountDialog() {
                               <Button variant="outline">Cancel</Button>
                          </DialogClose>
 
-                         <Button onClick={handleAdd} disabled={!name.trim() || creating}>
-                              {creating ? <AppSpinner text={recover ? "Recovering..." : "Creating..."} /> : recover ? "Recover" : "Add"}
+                         <Button
+                              onClick={handleAdd}
+                              disabled={
+                                   (recoverOnly && mnemonic.some((w) => !w.trim())) ||
+                                   (addOnly && !name.trim()) ||
+                                   (!recoverOnly && !addOnly && (recover ? mnemonic.some((w) => !w.trim()) : !name.trim())) ||
+                                   creating
+                              }
+                         >
+                              {creating ? (
+                                   <AppSpinner text={recover || recoverOnly ? "Recovering..." : "Creating..."} />
+                              ) : (
+                                   buttonText
+                              )}
                          </Button>
                     </DialogFooter>
                </DialogContent>
           </Dialog>
+     );
+}
+
+function MnemonicControls({
+     pasteMnemonic,
+     clearMnemonic,
+     hidden,
+     toggleHidden,
+}: {
+     pasteMnemonic: () => void;
+     clearMnemonic: () => void;
+     hidden: boolean;
+     toggleHidden: () => void;
+}) {
+     return (
+          <div className="flex items-center gap-2 justify-end">
+               <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button variant="outline" className="cursor-pointer" onClick={pasteMnemonic}>
+                              <ClipboardPaste />
+                         </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Paste</TooltipContent>
+               </Tooltip>
+
+               <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button variant="outline" className="cursor-pointer" onClick={clearMnemonic}>
+                              <EraserIcon />
+                         </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Clear</TooltipContent>
+               </Tooltip>
+
+               <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button variant="outline" className="cursor-pointer" onClick={toggleHidden}>
+                              {hidden ? <Eye /> : <EyeOff />}
+                         </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{hidden ? "Show" : "Hide"}</TooltipContent>
+               </Tooltip>
+          </div>
      );
 }

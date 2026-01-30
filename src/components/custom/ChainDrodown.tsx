@@ -9,7 +9,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setActiveWalletType } from "@/slices/appSlice";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check } from "lucide-react";
 
 type WalletType = "SOL" | "ETH";
 
@@ -39,7 +39,6 @@ export function ChainDropdown() {
      return (
           <div className="flex items-center gap-2">
                <DropdownMenu>
-
                     <DropdownMenuTrigger asChild>
                          <Button
                               variant="ghost"

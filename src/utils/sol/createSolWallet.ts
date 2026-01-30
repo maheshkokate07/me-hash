@@ -20,7 +20,10 @@ export const createSolWallet = (mnemonic: string, walletIdx: number = 0): Wallet
                type: "SOL",
                address: keyPair.publicKey.toBase58(),
                privateKey: Buffer.from(keyPair.secretKey).toString("hex"),
-               path
+               path,
+               balance: 0,
+               balanceUsd: 0,
+               lastUpdated: Date.now()
           }
      } catch (err: any) {
           throw err;

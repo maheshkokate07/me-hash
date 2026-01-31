@@ -42,7 +42,7 @@ export function ChainDropdown() {
                     <DropdownMenuTrigger asChild>
                          <Button
                               variant="ghost"
-                              className="h-full px-3 rounded-none flex items-center hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                              className="h-full cursor-pointer px-3 rounded-none flex items-center hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                          >
                               <Avatar className="h-6 w-6">
                                    <AvatarFallback className="p-0 overflow-hidden">

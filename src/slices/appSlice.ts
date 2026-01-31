@@ -10,6 +10,7 @@ type walletType = 'SOL' | 'ETH';
 
 export interface Wallet {
     walletIdx: number;
+    name: string;
     type: walletType;
     address: string;
     privateKey: string;
@@ -21,7 +22,7 @@ export interface Wallet {
     // isLoading: boolean;
 }
 
-interface Account {
+export interface Account {
     accountIdx: number;
     name: string;
     mnemonic: string;
@@ -70,7 +71,7 @@ export const createAccount = createAsyncThunk(
 
 export const addEthWallet = createAsyncThunk(
     "app/addEthWallet",
-    (payload: { accountIdx: number }, { getState, rejectWithValue }) => {
+    (payload: { accountIdx: number, name: string }, { getState, rejectWithValue }) => {
         const state = getState() as { app: AppState };
         const account = state.app.accounts.find(a => a.accountIdx === payload.accountIdx);
 
@@ -83,6 +84,8 @@ export const addEthWallet = createAsyncThunk(
         try {
             const maxWalletIdx = account.ethWallets.length > 0 ? Math.max(...account.ethWallets.map(w => w.walletIdx)) : -1;
             const wallet = createEthWallet(mnemonic, maxWalletIdx + 1);
+            if (payload.name)
+                wallet.name = payload.name.trim();
             return { accountIdx: payload.accountIdx, mnemonic, wallet };
         } catch (err: any) {
             console.error("Error craeting ETH wallet: ", err);
@@ -93,7 +96,7 @@ export const addEthWallet = createAsyncThunk(
 
 export const addSolWallet = createAsyncThunk(
     "app/addSolWallet",
-    (payload: { accountIdx: number }, { getState, rejectWithValue }) => {
+    (payload: { accountIdx: number, name: string }, { getState, rejectWithValue }) => {
         const state = getState() as { app: AppState };
         const account = state.app.accounts.find(a => a.accountIdx === payload.accountIdx);
 
@@ -106,6 +109,8 @@ export const addSolWallet = createAsyncThunk(
         try {
             const maxWalletIdx = account.solWallets.length > 0 ? Math.max(...account.solWallets.map(w => w.walletIdx)) : -1;
             const wallet = createSolWallet(mnemonic, maxWalletIdx + 1);
+            if (payload.name)
+                wallet.name = payload.name.trim();
             return { accountIdx: payload.accountIdx, mnemonic, wallet };
         } catch (err: any) {
             console.error("Error craeting SOL wallet: ", err);
@@ -201,6 +206,63 @@ const appSlice = createSlice({
             if (!account) return;
 
             account.name = name.trim();
+        },
+
+        updateWallet: (state, action: PayloadAction<{ accountIdx: number, walletType: walletType, walletIdx: number, name: string }>) => {
+            const { accountIdx, walletType, walletIdx, name } = action.payload;
+
+            const account = state.accounts.find((a) => a.accountIdx === accountIdx);
+            if (!account) return;
+
+            const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
+
+            const wallet = wallets.find((w) => w.walletIdx === walletIdx);
+            if (!wallet) return;
+
+            wallet.name = name;
+        },
+
+        removeAccount: (state, action: PayloadAction<number>) => {
+            const removedIdx = action.payload;
+            if (removedIdx === undefined) return;
+
+            state.accounts = state.accounts.filter(a => a.accountIdx !== removedIdx);
+
+            if (state.accounts.length === 0) {
+                state.activeAccountIdx = -1;
+                state.activeWalletIdx = -1;
+                return;
+            }
+
+            if (state.activeAccountIdx !== removedIdx) return;
+
+            const prev = state.accounts
+                .filter(a => a.accountIdx < removedIdx)
+                .sort((a, b) => b.accountIdx - a.accountIdx)[0];
+
+            const next = state.accounts
+                .filter(a => a.accountIdx > removedIdx)
+                .sort((a, b) => a.accountIdx - b.accountIdx)[0];
+
+            const target = prev ?? next;
+
+            if (!target) {
+                state.activeAccountIdx = -1;
+                state.activeWalletIdx = -1;
+                return;
+            }
+
+            state.activeAccountIdx = target.accountIdx;
+
+            if (target.ethWallets.length > 0) {
+                state.activeWalletType = 'ETH';
+                state.activeWalletIdx = 0;
+            } else if (target.solWallets.length > 0) {
+                state.activeWalletType = 'SOL';
+                state.activeWalletIdx = 0;
+            } else {
+                state.activeWalletIdx = -1;
+            }
         },
 
         setActiveAccount: (state, action: PayloadAction<number>) => {
@@ -320,5 +382,5 @@ const appSlice = createSlice({
     }
 })
 
-export const { setActiveAccount, setActiveWalletType, setActiveWalletIdx, updateAccount } = appSlice.actions;
+export const { setActiveAccount, setActiveWalletType, setActiveWalletIdx, updateAccount, removeAccount, updateWallet } = appSlice.actions;
 export default appSlice.reducer;

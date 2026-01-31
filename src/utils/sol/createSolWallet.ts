@@ -17,6 +17,7 @@ export const createSolWallet = (mnemonic: string, walletIdx: number = 0): Wallet
 
           return {
                walletIdx,
+               name: `Wallet ${walletIdx}`,
                type: "SOL",
                address: keyPair.publicKey.toBase58(),
                privateKey: Buffer.from(keyPair.secretKey).toString("hex"),

@@ -22,11 +22,11 @@ export default function Onboarding() {
      };
 
      return (
-          <div className="h-screen flex items-center justify-center bg-lime-50 p-3">
+          <div className="h-screen flex items-center justify-center p-3">
                <div className="w-full max-w-xl h-full max-h-120 flex flex-col items-center justify-between text-center">
                     <div className="flex flex-col items-center gap-5">
                          {/* Avatar / Logo */}
-                         <div className="h-24 w-24 rounded-full bg-lime-100 flex items-center justify-center">
+                         <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
                               <span className="text-3xl font-bold text-gray-900 select-none">MH</span>
                          </div>
 

@@ -13,6 +13,7 @@ export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet
 
           return {
                walletIdx,
+               name: `Wallet ${walletIdx}`,
                type: "ETH",
                address: wallet.address,
                privateKey: wallet.privateKey,

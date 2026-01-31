@@ -23,6 +23,8 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
 
      const wallets = activeWalletType === "SOL" ? activeAccount?.solWallets : activeAccount?.ethWallets;
 
+     const activeWallet: any = wallets?.find(w => w.walletIdx === activeWalletIdx);
+
      return (
           <div className="flex items-center gap-2">
                <DropdownMenu>
@@ -30,10 +32,10 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
                     <DropdownMenuTrigger asChild disabled={wallets?.length === 0}>
                          <Button
                               variant="ghost"
-                              className="h-full px-3 rounded-none flex items-center hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                              className="h-full cursor-pointer px-3 rounded-none flex items-center hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                          >
                               <span className="h-6 flex items-center justify-center gap-1.5">
-                                   {activeWalletIdx !== -1 ? `Wallet ${activeWalletIdx}` : `No ${activeWalletType} Wallets`}
+                                   {activeWalletIdx !== -1 ? `${activeWallet.name}` : `No ${activeWalletType} Wallets`}
                                    {activeWalletIdx !== -1 && <ChevronsUpDown className="text-gray-500" />}
                               </span>
                          </Button>
@@ -59,7 +61,7 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
                                              </Avatar>
 
                                              <div className="flex flex-col overflow-hidden gap-0.5">
-                                                  <span className="text-sm font-medium">{`Wallet ${wallet.walletIdx}`}</span>
+                                                  <span className="text-sm font-medium">{`${wallet.name}`}</span>
                                                   <span className="text-xs text-gray-400 truncate">{wallet.address}</span>
                                              </div>
                                         </DropdownMenuItem>

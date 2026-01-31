@@ -45,9 +45,9 @@ export default function AddWalletDialog({
 
           try {
                if (walletType === 'SOL') {
-                    await dispatch(addSolWallet({ accountIdx })).unwrap();
+                    await dispatch(addSolWallet({ accountIdx, name })).unwrap();
                } else if (walletType === 'ETH') {
-                    await dispatch(addEthWallet({ accountIdx })).unwrap();
+                    await dispatch(addEthWallet({ accountIdx, name })).unwrap();
                } else {
                     throw new Error("Select a valid wallet type");
                }

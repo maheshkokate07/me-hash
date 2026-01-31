@@ -8,17 +8,23 @@ import EmptyAccount from "./components/custom/EmptyAccount";
 import Wallet from "./components/custom/Wallet";
 import WalletInfoDialog from "./components/custom/WalletInfoDialog";
 import ReceiveDialog from "./components/custom/ReceiveDialog";
+import RemoveAccountDialog from "./components/custom/RemoveAccountDialog";
 
 export default function App() {
   const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx } = useAppSelector((state) => state.app);
 
   const [addAccountOpen, setAddAccountOpen] = useState(false);
+
   const [updateOnly, setUpdateOnly] = useState(false);
   const [recoverOnly, setRecoverOnly] = useState(false);
   const [showMnemonicOnly, setShowMnemonicOnly] = useState(false);
+
   const [addWalletOpen, setAddWalletOpen] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
+
   const [receiveOpen, setReceiveOpen] = useState(false);
+
+  const [removeAccountOpen, setRemoveAccountOpen] = useState(false);
 
   const openAddAccount = () => {
     setUpdateOnly(false);
@@ -26,27 +32,33 @@ export default function App() {
     setShowMnemonicOnly(false);
     setAddAccountOpen(true);
   }
+
   const openUpdateAccount = () => {
     setUpdateOnly(true);
     setRecoverOnly(false);
     setShowMnemonicOnly(false);
     setAddAccountOpen(true);
   }
+
   const openRecoverAccount = () => {
     setUpdateOnly(false);
     setRecoverOnly(true);
     setShowMnemonicOnly(false);
     setAddAccountOpen(true);
   }
+
   const openShowMnemonic = () => {
     setRecoverOnly(true);
     setUpdateOnly(false);
     setShowMnemonicOnly(true);
     setAddAccountOpen(true);
   }
+
   const openAddWallet = () => setAddWalletOpen(true);
   const openWalletInfo = () => setWalletInfoOpen(true);
   const openReceive = () => setReceiveOpen(true);
+
+  const openRemoveAccount = () => setRemoveAccountOpen(true);
 
   if (accounts.length === 0) return <Onboarding />
 
@@ -61,7 +73,7 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openShowMnemonic={openShowMnemonic} openAddWallet={openAddWallet} />
+      <Header openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openShowMnemonic={openShowMnemonic} openRemoveAccount={openRemoveAccount} openAddWallet={openAddWallet} />
 
       {
         activeAccount && activeWalletIdx === -1 ?
@@ -86,6 +98,16 @@ export default function App() {
         walletType={activeWalletType}
         accountIdx={activeAccountIdx}
       />
+
+      {
+        activeAccount &&
+        <RemoveAccountDialog
+          open={removeAccountOpen}
+          onOpenChange={setRemoveAccountOpen}
+          activeAccount={activeAccount}
+          onShowMnemonic={openShowMnemonic}
+        />
+      }
 
       {
         activeWallet &&

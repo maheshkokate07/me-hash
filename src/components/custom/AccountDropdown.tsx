@@ -20,12 +20,14 @@ export function AccountDropdown({
      onAddAccount,
      onUpdateAccount,
      onRecoverAccount,
-     onShowMnemonic
+     onShowMnemonic,
+     onRemoveAccount
 }: {
      onAddAccount: () => void,
      onUpdateAccount: () => void,
      onRecoverAccount: () => void
-     onShowMnemonic: () => void
+     onShowMnemonic: () => void,
+     onRemoveAccount: () => void
 }) {
      const dispatch = useAppDispatch()
      const { accounts, activeAccountIdx } = useAppSelector(state => state.app);
@@ -137,6 +139,10 @@ export function AccountDropdown({
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                              className="py-2 px-4 focus:bg-red-100 text-red-600 focus:text-red-700"
+                                             onSelect={(e) => {
+                                                  e.preventDefault();
+                                                  onRemoveAccount();
+                                             }}
                                         >
                                              Remove
                                         </DropdownMenuItem>
@@ -145,6 +151,6 @@ export function AccountDropdown({
                          </DropdownMenuSub>
                     </DropdownMenuContent>
                </DropdownMenu>
-          </div>
+          </div >
      )
 }

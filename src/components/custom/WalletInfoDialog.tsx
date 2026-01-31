@@ -5,9 +5,10 @@ import { Label } from "@radix-ui/react-label";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import type { Wallet } from "@/slices/appSlice";
+import { updateWallet, type Wallet } from "@/slices/appSlice";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { CircleAlert, Copy, Eye, EyeOff } from "lucide-react";
+import { Check, CircleAlert, Copy, Eye, EyeOff, Pencil } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 type WalletInfoDialogProps = {
      wallet: Wallet;
@@ -25,10 +26,16 @@ export default function WalletInfoDialog({
      open,
      onOpenChange,
 }: WalletInfoDialogProps) {
-     const { walletIdx, address, privateKey, type } = wallet;
+     const dispatch = useAppDispatch();
+     const { activeAccountIdx, activeWalletType } = useAppSelector(state => state.app);
+
+     const { walletIdx, address, privateKey, type, name } = wallet;
+
      const walletName = type === "SOL" ? "Solana" : "Ethereum";
 
      const [showPrivateKey, setShowPrivateKey] = useState(false);
+     const [editting, setEditting] = useState(false);
+     const [newName, setNewName] = useState(name);
 
      const toogleShowPrivateKey = () => setShowPrivateKey((prev) => !prev);
 
@@ -40,6 +47,15 @@ export default function WalletInfoDialog({
                console.error("Failed to copy text:", err);
           }
      };
+
+     const toggleEditting = () => {
+          if (editting) {
+               dispatch(updateWallet({ accountIdx: activeAccountIdx, walletType: activeWalletType, walletIdx, name: newName }));
+               setEditting(false);
+          } else {
+               setEditting(true);
+          }
+     }
 
      return (
           <Dialog open={open} onOpenChange={onOpenChange}>
@@ -63,13 +79,28 @@ export default function WalletInfoDialog({
                          <Label htmlFor="wallet-name" className="ml-1">
                               Name
                          </Label>
-                         <Input
-                              id="wallet-name"
-                              value={`Wallet ${walletIdx}`}
-                              disabled={true}
-                              className="disabled:opacity-90 disabled:text-gray-600 h-10"
-                              autoFocus
-                         />
+                         <div className="flex gap-1">
+                              <Input
+                                   id="wallet-name"
+                                   value={newName}
+                                   disabled={!editting}
+                                   onChange={(e) => setNewName(e.target.value)}
+                                   className="disabled:opacity-90 disabled:text-gray-600 h-10"
+                                   autoFocus
+                              />
+                              <Tooltip>
+                                   <TooltipTrigger asChild>
+                                        <Button
+                                             variant="outline"
+                                             className="cursor-pointer h-10"
+                                             onClick={toggleEditting}
+                                        >
+                                             {editting ? <Check /> : <Pencil />}
+                                        </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>{editting ? "Save" : "Edit"}</TooltipContent>
+                              </Tooltip>
+                         </div>
                     </div>
 
                     <div className="grid gap-1">

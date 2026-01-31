@@ -11,12 +11,14 @@ export default function Header({
      openUpdateAccount,
      openRecoverAccount,
      openShowMnemonic,
+     openRemoveAccount,
      openAddWallet
 }: {
      openAddAccount: () => void,
      openUpdateAccount: () => void,
      openRecoverAccount: () => void,
      openShowMnemonic: () => void,
+     openRemoveAccount: () => void,
      openAddWallet: () => void
 }) {
 
@@ -45,7 +47,7 @@ export default function Header({
                     <div className="border-r h-full">
                     </div>
 
-                    <AccountDropdown onAddAccount={openAddAccount} onUpdateAccount={openUpdateAccount} onRecoverAccount={openRecoverAccount} onShowMnemonic={openShowMnemonic} />
+                    <AccountDropdown onAddAccount={openAddAccount} onUpdateAccount={openUpdateAccount} onRecoverAccount={openRecoverAccount} onShowMnemonic={openShowMnemonic} onRemoveAccount={openRemoveAccount} />
                </div>
 
                <div>

@@ -37,7 +37,7 @@ export default function Header({
      const copyCurrentAddress = () => {
           if (activeWallet?.address) {
                navigator.clipboard.writeText(activeWallet.address);
-               toast.success("Wallet address copied");
+               toast.success("Copied.");
           }
      }
 

@@ -1,10 +1,11 @@
-import { Copy } from "lucide-react";
+import { Copy, Moon, Sun } from "lucide-react";
 import { Button } from "../ui/button";
 import { AccountDropdown } from "./AccountDropdown";
 import { ChainDropdown } from "./ChainDrodown";
 import { WalletDropdown } from "./WalletDropdown";
 import { useAppSelector } from "@/store/hooks";
 import type { Wallet } from "@/slices/appSlice";
+import { Switch } from "../ui/switch";
 
 export default function Header({
      openAddAccount,
@@ -40,11 +41,11 @@ export default function Header({
      }
 
      return (
-          <header className="h-16 border-b border-gray-200 flex items-center px-6 justify-between">
-               <div className="flex flex-1 items-center gap-4 h-full">
-                    <h1 className="text-2xl font-bold select-none">MeHash</h1>
+          <header className=" w-full bg-white top-0 z-50 border-b border-gray-200 flex items-center gap-2 sm:gap-4 px-5 justify-between" style={{height: '64px'}}>
+               <div className="flex flex-1 items-center justify-start gap-4 h-full">
+                    <h1 className="text-2xl font-bold select-none hidden sm:block">MeHash</h1>
 
-                    <div className="border-r h-full">
+                    <div className="border-r h-full hidden sm:block">
                     </div>
 
                     <AccountDropdown onAddAccount={openAddAccount} onUpdateAccount={openUpdateAccount} onRecoverAccount={openRecoverAccount} onShowMnemonic={openShowMnemonic} onRemoveAccount={openRemoveAccount} />
@@ -73,8 +74,15 @@ export default function Header({
                     </div>
                </div>
 
-               <div className="flex-1">
-
+               <div className="flex items-center justify-end gap-2.5 flex-1 h-10">
+                    <Sun className="text-gray-800 hide" />
+                    <Switch
+                         id="recover-switch"
+                         // checked={recover}
+                         // onCheckedChange={setRecover}
+                         className="cursor-pointer theme-switch"
+                    />
+                    <Moon className="text-gray-800 hide" />
                </div>
           </header>
      )

@@ -117,7 +117,25 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@media (max-width: 499px) {
+  .hide {
+    display: none;
+  }
+}
+
+.theme-switch {
+  height: 28px;
+  width: 48px;
+}
+
+.theme-switch>span {
+  margin-left: 2px;
+  height: 22px;
+  width: 22px;
 }

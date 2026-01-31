@@ -43,21 +43,25 @@ export function AccountDropdown({
      return (
           <div className="flex items-center justify-center gap-2">
                <DropdownMenu>
-                    <Avatar className="h-10 w-10">
-                         <AvatarFallback className="flex items-center justify-center text-sm font-semibold leading-none">
-                              {activeAccount ? getInitials(activeAccount.name) : "NA"}
-                         </AvatarFallback>
-                    </Avatar>
                     <DropdownMenuTrigger asChild>
-                         <Button variant="outline" className="cursor-pointer text-gray-500 h-10 w-8">
-                              <ChevronsUpDown />
-                         </Button>
+                         <div className="flex items-center gap-2 cursor-pointer">
+                              <Avatar className="h-10 w-10">
+                                   <AvatarFallback className="flex hover:bg-gray-200 transition items-center justify-center text-sm font-semibold leading-none">
+                                        {activeAccount ? getInitials(activeAccount.name) : "NA"}
+                                   </AvatarFallback>
+                              </Avatar>
+
+                              <Button variant="outline" className="cursor-pointer hide text-gray-500 h-10 w-8">
+                                   <ChevronsUpDown />
+                              </Button>
+                         </div>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent className="w-64" align="start">
                          <DropdownMenuGroup>
                               {accounts?.map(account => {
-                                   const isActive = account.accountIdx === activeAccountIdx
+                                   const isActive = account.accountIdx === activeAccountIdx;
+                                   const totalWallets = account.solWallets.length + account.ethWallets.length;
 
                                    return (
                                         <DropdownMenuItem
@@ -74,8 +78,8 @@ export function AccountDropdown({
                                              </Avatar>
 
                                              <div className="flex flex-col">
-                                                  <span className="text-sm font-medium">{account.name}</span>
-                                                  <span className="text-xs text-gray-400">{account.solWallets.length + account.ethWallets.length + " wallets"}</span>
+                                                  <span className="text-sm font-medium truncate w-44">{account.name}</span>
+                                                  <span className="text-xs text-gray-400">{totalWallets} {totalWallets === 1 ? "wallet" : "wallets"}</span>
                                              </div>
                                         </DropdownMenuItem>
                                    )

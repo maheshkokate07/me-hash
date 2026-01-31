@@ -6,7 +6,17 @@ import { WalletDropdown } from "./WalletDropdown";
 import { useAppSelector } from "@/store/hooks";
 import type { Wallet } from "@/slices/appSlice";
 
-export default function Header({ openAddAccount, openAddWallet }: { openAddAccount: () => void, openAddWallet: () => void }) {
+export default function Header({
+     openAddAccount,
+     openUpdateAccount,
+     openRecoverAccount,
+     openAddWallet
+}: {
+     openAddAccount: () => void,
+     openUpdateAccount: () => void,
+     openRecoverAccount: () => void,
+     openAddWallet: () => void
+}) {
 
      const { activeAccountIdx, accounts, activeWalletIdx, activeWalletType } = useAppSelector((state) => state.app);
 
@@ -33,7 +43,7 @@ export default function Header({ openAddAccount, openAddWallet }: { openAddAccou
                     <div className="border-r h-full">
                     </div>
 
-                    <AccountDropdown onAddAccount={openAddAccount} />
+                    <AccountDropdown onAddAccount={openAddAccount} onUpdateAccount={openUpdateAccount} onRecoverAccount={openRecoverAccount} />
                </div>
 
                <div>

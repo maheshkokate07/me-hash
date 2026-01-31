@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAppDispatch } from "@/store/hooks";
-import { createAccount, recoverWallets } from "@/slices/appSlice";
+import { createAccount, recoverWallets, updateAccount } from "@/slices/appSlice";
 import { ClipboardPaste, EraserIcon, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { AppSpinner } from "./Spinner";
@@ -22,6 +22,9 @@ type AddAccountDialogProps = {
      onOpenChange: (open: boolean) => void;
      recoverOnly?: boolean;
      addOnly?: boolean;
+     updateOnly?: boolean;
+     accountName?: string;
+     accountIdx?: number;
 };
 
 export function AddAccountDialog({
@@ -29,6 +32,9 @@ export function AddAccountDialog({
      onOpenChange,
      recoverOnly,
      addOnly,
+     updateOnly,
+     accountName,
+     accountIdx
 }: AddAccountDialogProps) {
      const dispatch = useAppDispatch();
 
@@ -40,7 +46,11 @@ export function AddAccountDialog({
 
      useEffect(() => {
           if (open) {
-               setName("");
+               if (updateOnly && accountName) {
+                    setName(accountName);
+               } else {
+                    setName("");
+               }
                setMnemonic(Array(12).fill(""));
                setHidden(true);
                if (recoverOnly) {
@@ -68,10 +78,13 @@ export function AddAccountDialog({
                          recoverWallets({
                               mnemonic: mnemonicStr,
                               name: name.trim() || undefined,
+                              accountIdx
                          })
                     ).unwrap();
-               } else if (addOnly || (!recoverOnly && !recover)) {
+               } else if (addOnly || (!recoverOnly && !recover && !updateOnly)) {
                     await dispatch(createAccount({ name: name.trim() || undefined })).unwrap();
+               } else if (updateOnly && accountIdx) {
+                    await dispatch(updateAccount({ accountIdx, name }));
                }
 
                onOpenChange(false);
@@ -119,6 +132,9 @@ export function AddAccountDialog({
      } else if (addOnly) {
           title = "Add new account";
           buttonText = "Add";
+     } else if (updateOnly) {
+          title = "Update account name";
+          buttonText = "Update"
      } else {
           title = recover ? "Recover existing wallets" : "Add new account";
           buttonText = recover ? "Recover" : "Add";
@@ -133,7 +149,7 @@ export function AddAccountDialog({
 
                     <div className="grid gap-4 py-2">
                          {/* Account Name Input */}
-                         {!recoverOnly && !addOnly && (
+                         {((!recoverOnly && !addOnly) || updateOnly) && (
                               <div className="grid gap-2">
                                    <Label htmlFor="account-name">Account name</Label>
                                    <Input
@@ -161,7 +177,7 @@ export function AddAccountDialog({
                          )}
 
                          {/* Recover Wallet Switch */}
-                         {!recoverOnly && !addOnly && (
+                         {!recoverOnly && !addOnly && !updateOnly && (
                               <div className="flex items-center justify-between">
                                    <div className="flex items-center gap-2">
                                         <span>Recover existing wallets</span>
@@ -229,6 +245,7 @@ export function AddAccountDialog({
                          <Button
                               onClick={handleAdd}
                               disabled={
+                                   (updateOnly && !name.trim()) ||
                                    (recoverOnly && mnemonic.some((w) => !w.trim())) ||
                                    (addOnly && !name.trim()) ||
                                    (!recoverOnly && !addOnly && (recover ? mnemonic.some((w) => !w.trim()) : !name.trim())) ||
@@ -236,7 +253,7 @@ export function AddAccountDialog({
                               }
                          >
                               {creating ? (
-                                   <AppSpinner text={recover || recoverOnly ? "Recovering..." : "Creating..."} />
+                                   <AppSpinner text={updateOnly ? "Updating..." : (recover || recoverOnly) ? "Recovering..." : "Creating..."} />
                               ) : (
                                    buttonText
                               )}

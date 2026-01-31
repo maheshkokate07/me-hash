@@ -36,9 +36,10 @@ export default function ReceiveDialog({
                     </DialogHeader>
 
                     <div className="text-center flex items-center flex-col gap-6 mt-4">
-                         <p className="w-70 text-wrap wrap-break-word text-lg">
+                         <p className="wrap-break-word w-65 sm:w-75 text-[20px] font-mono bg-gray-50 p-2 rounded">
                               {address}
                          </p>
+
                          <Button
                               className="cursor-pointer text-md px-4.5 py-5.5"
                               onClick={copyToClipboard}

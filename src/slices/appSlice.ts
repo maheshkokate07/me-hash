@@ -194,6 +194,15 @@ const appSlice = createSlice({
     name: "app",
     initialState,
     reducers: {
+        updateAccount: (state, action: PayloadAction<{ accountIdx: number, name: string }>) => {
+            const { accountIdx, name } = action.payload;
+
+            const account = state.accounts.find((a) => a.accountIdx === accountIdx);
+            if (!account) return;
+
+            account.name = name.trim();
+        },
+
         setActiveAccount: (state, action: PayloadAction<number>) => {
             state.activeAccountIdx = action.payload;
 
@@ -211,6 +220,7 @@ const appSlice = createSlice({
                 state.activeWalletIdx = -1;
             }
         },
+
         setActiveWalletType: (state, action: PayloadAction<walletType>) => {
             state.activeWalletType = action.payload;
 
@@ -223,6 +233,7 @@ const appSlice = createSlice({
                 state.activeWalletIdx = solWallets.length > 0 ? 0 : -1;
             }
         },
+
         setActiveWalletIdx: (state, action: PayloadAction<number>) => {
             state.activeWalletIdx = action.payload;
         },
@@ -230,6 +241,8 @@ const appSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(createAccount.fulfilled, (state, action) => {
+                if (!action.payload) return;
+
                 state.accounts.push(action.payload)
                 state.activeAccountIdx = action.payload.accountIdx;
                 state.activeWalletIdx = -1;
@@ -307,5 +320,5 @@ const appSlice = createSlice({
     }
 })
 
-export const { setActiveAccount, setActiveWalletType, setActiveWalletIdx } = appSlice.actions;
+export const { setActiveAccount, setActiveWalletType, setActiveWalletIdx, updateAccount } = appSlice.actions;
 export default appSlice.reducer;

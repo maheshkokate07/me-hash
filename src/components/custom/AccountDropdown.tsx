@@ -16,7 +16,15 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { setActiveAccount } from "@/slices/appSlice"
 import { ChevronsUpDown, Plus, Settings } from "lucide-react"
 
-export function AccountDropdown({ onAddAccount }: { onAddAccount: () => void }) {
+export function AccountDropdown({
+     onAddAccount,
+     onUpdateAccount,
+     onRecoverAccount
+}: {
+     onAddAccount: () => void,
+     onUpdateAccount: () => void,
+     onRecoverAccount: () => void
+}) {
      const dispatch = useAppDispatch()
      const { accounts, activeAccountIdx } = useAppSelector(state => state.app);
 
@@ -91,10 +99,6 @@ export function AccountDropdown({ onAddAccount }: { onAddAccount: () => void }) 
 
                          <DropdownMenuSub>
                               <DropdownMenuSubTrigger
-                                   onSelect={(e) => {
-                                        e.preventDefault();
-                                        onAddAccount();
-                                   }}
                                    className="flex items-center gap-3 font-medium cursor-pointer"
                               >
                                    <Avatar className="h-8 w-8">
@@ -106,10 +110,32 @@ export function AccountDropdown({ onAddAccount }: { onAddAccount: () => void }) 
                               </DropdownMenuSubTrigger>
                               <DropdownMenuPortal>
                                    <DropdownMenuSubContent>
-                                        <DropdownMenuItem className="py-2 px-4">Update Account Name</DropdownMenuItem>
-                                        <DropdownMenuItem className="py-2 px-4">{isAccountEmpty ? 'Recover Wallets' : 'Secret Recovery Phrase'}</DropdownMenuItem>
+                                        <DropdownMenuItem
+                                             onSelect={(e) => {
+                                                  e.preventDefault();
+                                                  onUpdateAccount();
+                                             }}
+                                             className="py-2 px-4"
+                                        >
+                                             Update Account Name
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                             className="py-2 px-4"
+                                             onSelect={(e) => {
+                                                  e.preventDefault();
+                                                  if (isAccountEmpty) {
+                                                       onRecoverAccount();
+                                                  }
+                                             }}
+                                        >
+                                             {isAccountEmpty ? 'Recover Wallets' : 'Secret Recovery Phrase'}
+                                        </DropdownMenuItem>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="py-2 px-4 focus:bg-red-100 text-red-600 focus:text-red-700">Remove</DropdownMenuItem>
+                                        <DropdownMenuItem
+                                             className="py-2 px-4 focus:bg-red-100 text-red-600 focus:text-red-700"
+                                        >
+                                             Remove
+                                        </DropdownMenuItem>
                                    </DropdownMenuSubContent>
                               </DropdownMenuPortal>
                          </DropdownMenuSub>

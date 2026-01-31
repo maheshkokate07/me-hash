@@ -13,11 +13,27 @@ export default function App() {
   const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx } = useAppSelector((state) => state.app);
 
   const [addAccountOpen, setAddAccountOpen] = useState(false);
+  const [updateOnly, setUpdateOnly] = useState(false);
+  const [recoverOnly, setRecoverOnly] = useState(false);
   const [addWalletOpen, setAddWalletOpen] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
 
-  const openAddAccount = () => setAddAccountOpen(true);
+  const openAddAccount = () => {
+    setUpdateOnly(false);
+    setRecoverOnly(false);
+    setAddAccountOpen(true);
+  }
+  const openUpdateAccount = () => {
+    setUpdateOnly(true);
+    setRecoverOnly(false);
+    setAddAccountOpen(true);
+  }
+  const openRecoverAccount = () => {
+    setUpdateOnly(false);
+    setRecoverOnly(true);
+    setAddAccountOpen(true);
+  }
   const openAddWallet = () => setAddWalletOpen(true);
   const openWalletInfo = () => setWalletInfoOpen(true);
   const openReceive = () => setReceiveOpen(true);
@@ -35,7 +51,7 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header openAddAccount={openAddAccount} openAddWallet={openAddWallet} />
+      <Header openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openAddWallet={openAddWallet} />
 
       {
         activeAccount && activeWalletIdx === -1 ?
@@ -46,6 +62,10 @@ export default function App() {
       <AddAccountDialog
         open={addAccountOpen}
         onOpenChange={setAddAccountOpen}
+        updateOnly={updateOnly}
+        recoverOnly={recoverOnly}
+        accountIdx={(recoverOnly || updateOnly) ? activeAccountIdx : undefined}
+        accountName={activeAccount?.name}
       />
 
       <AddWalletDialog

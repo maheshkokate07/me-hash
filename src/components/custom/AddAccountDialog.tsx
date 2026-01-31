@@ -16,6 +16,7 @@ import { createAccount, recoverWallets, updateAccount } from "@/slices/appSlice"
 import { CircleAlert, ClipboardPaste, Copy, EraserIcon, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { AppSpinner } from "./Spinner";
+import { toast } from "sonner";
 
 type AddAccountDialogProps = {
      open: boolean;
@@ -90,15 +91,19 @@ export function AddAccountDialog({
                               accountIdx
                          })
                     ).unwrap();
+
+                    toast.success("Wallets recovered successfully.")
                } else if (addOnly || (!recoverOnly && !recover && !updateOnly)) {
                     await dispatch(createAccount({ name: name.trim() || undefined })).unwrap();
+                    toast.success("Account created successfully.")
                } else if (updateOnly && accountIdx) {
                     await dispatch(updateAccount({ accountIdx, name }));
+                    toast.success("Account updated successfully.")
                }
 
                onOpenChange(false);
-          } catch (err) {
-               console.error("Failed to create account: ", err);
+          } catch (err: any) {
+               toast.error(err);
           } finally {
                setCreating(false);
           }
@@ -119,22 +124,20 @@ export function AddAccountDialog({
 
                if (words.length === 12) {
                     setMnemonic(words);
-                    alert("Mnemonic pasted successfully!");
                } else {
-                    alert("Clipboard does not contain exactly 12 words.");
+                    toast.error("Clipboard does not contain exactly 12 words.");
                }
           } catch (err) {
-               console.error("Failed to read clipboard: ", err);
-               alert("Unable to read clipboard. Please try manually.");
+               toast.error("Unable to read clipboard. Please try manually.");
           }
      };
 
      const copyMnemonic = async () => {
           try {
                await navigator.clipboard.writeText(mnemonic.join(" "));
-               alert("Copied");
+               toast.success("Copied.")
           } catch (err) {
-               console.error("Failed to copy mnemonic:", err);
+               toast.error("Failed to copy.")
           }
      }
 

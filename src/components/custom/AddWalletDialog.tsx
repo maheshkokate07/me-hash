@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useAppDispatch } from "@/store/hooks";
 import { addEthWallet, addSolWallet } from "@/slices/appSlice";
+import { toast } from "sonner";
 
 type AddWalletDialogProps = {
      open: boolean;
@@ -37,8 +38,7 @@ export default function AddWalletDialog({
 
      const handleAdd = async () => {
           if (accountIdx === -1) {
-               alert("Select an account first");
-               return;
+               throw new Error("Select an account first.");
           }
 
           setCreating(true);
@@ -49,13 +49,15 @@ export default function AddWalletDialog({
                } else if (walletType === 'ETH') {
                     await dispatch(addEthWallet({ accountIdx, name })).unwrap();
                } else {
-                    throw new Error("Select a valid wallet type");
+                    throw new Error("Select a valid wallet type.");
                }
+
+               toast.success(`${walletName} wallet addedd successfully.`)
 
                onOpenChange(false);
                setName("");
-          } catch (err) {
-               console.error("Failed to add wallet: ", err);
+          } catch (err: any) {
+               toast.error(err);
           } finally {
                setCreating(false);
           }

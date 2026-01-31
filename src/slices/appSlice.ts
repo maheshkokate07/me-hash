@@ -76,7 +76,7 @@ export const addEthWallet = createAsyncThunk(
         const account = state.app.accounts.find(a => a.accountIdx === payload.accountIdx);
 
         if (!account) {
-            return rejectWithValue("Account not found");
+            return rejectWithValue("Account not found.");
         }
 
         const mnemonic = !!account.mnemonic ? account.mnemonic : bip39.generateMnemonic(128);
@@ -88,8 +88,7 @@ export const addEthWallet = createAsyncThunk(
                 wallet.name = payload.name.trim();
             return { accountIdx: payload.accountIdx, mnemonic, wallet };
         } catch (err: any) {
-            console.error("Error craeting ETH wallet: ", err);
-            return rejectWithValue("Failed to create ETH wallet");
+            return rejectWithValue("Failed to create ETH wallet.");
         }
     }
 );
@@ -101,7 +100,7 @@ export const addSolWallet = createAsyncThunk(
         const account = state.app.accounts.find(a => a.accountIdx === payload.accountIdx);
 
         if (!account) {
-            return rejectWithValue("Account not found");
+            return rejectWithValue("Account not found.");
         }
 
         const mnemonic = !!account.mnemonic ? account.mnemonic : bip39.generateMnemonic(128);
@@ -113,8 +112,7 @@ export const addSolWallet = createAsyncThunk(
                 wallet.name = payload.name.trim();
             return { accountIdx: payload.accountIdx, mnemonic, wallet };
         } catch (err: any) {
-            console.error("Error craeting SOL wallet: ", err);
-            return rejectWithValue("Failed to create SOL wallet");
+            return rejectWithValue("Failed to create SOL wallet.");
         }
     }
 );
@@ -125,11 +123,11 @@ export const recoverWallets = createAsyncThunk(
         let { mnemonic, accountIdx, name } = payload;
 
         if (!mnemonic) {
-            return rejectWithValue("Mnemonic is required");
+            return rejectWithValue("Mnemonic is required.");
         }
 
         if (!bip39.validateMnemonic(mnemonic)) {
-            return rejectWithValue("Invalid mnemonic");
+            return rejectWithValue("Invalid mnemonic.");
         }
 
         const state = getState() as { app: AppState };
@@ -141,11 +139,11 @@ export const recoverWallets = createAsyncThunk(
             account = state.app.accounts.find(a => a.accountIdx === accountIdx);
 
             if (!account) {
-                return rejectWithValue("Account not found");
+                return rejectWithValue("Account not found.");
             }
 
             if (account?.ethWallets.length > 0 || account?.solWallets.length > 0) {
-                return rejectWithValue("This account already has wallets, try in fresh account");
+                return rejectWithValue("This account already has wallets, try in fresh account.");
             }
         } else {
             let maxIdx =
@@ -161,8 +159,7 @@ export const recoverWallets = createAsyncThunk(
             const wallets = await importWalletsByMnemonic(mnemonic);
             return { accountIdx, name, wallets, create, mnemonic, createdAt: Date.now() };
         } catch (err) {
-            console.error("Error recovering wallets: ", err);
-            return rejectWithValue("Failed to recover wallets");
+            return rejectWithValue("Failed to recover wallets.");
         }
     }
 )
@@ -189,8 +186,7 @@ export const fetchBalance = createAsyncThunk(
                 lastUpdated: Date.now()
             }
         } catch (err) {
-            console.error("Error fetching balance: ", err);
-            return rejectWithValue("Failed to fetch balance");
+            return rejectWithValue("Failed to fetch balance.");
         }
     }
 )

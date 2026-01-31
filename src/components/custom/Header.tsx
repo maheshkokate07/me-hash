@@ -6,6 +6,7 @@ import { WalletDropdown } from "./WalletDropdown";
 import { useAppSelector } from "@/store/hooks";
 import type { Wallet } from "@/slices/appSlice";
 import { Switch } from "../ui/switch";
+import { toast } from "sonner";
 
 export default function Header({
      openAddAccount,
@@ -36,12 +37,12 @@ export default function Header({
      const copyCurrentAddress = () => {
           if (activeWallet?.address) {
                navigator.clipboard.writeText(activeWallet.address);
-               alert("Wallet address copied!");
+               toast.success("Wallet address copied");
           }
      }
 
      return (
-          <header className=" w-full bg-white top-0 z-50 border-b border-gray-200 flex items-center gap-2 sm:gap-4 px-5 justify-between" style={{height: '64px'}}>
+          <header className=" w-full bg-white top-0 z-50 border-b border-gray-200 flex items-center gap-2 sm:gap-4 px-5 justify-between" style={{ height: '64px' }}>
                <div className="flex flex-1 items-center justify-start gap-4 h-full">
                     <h1 className="text-2xl font-bold select-none hidden sm:block">MeHash</h1>
 

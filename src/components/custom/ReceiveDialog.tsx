@@ -2,6 +2,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { Button } from "../ui/button";
 import type { Wallet } from "@/slices/appSlice";
+import { toast } from "sonner";
 
 type ReceiveDialogProps = {
      wallet: Wallet;
@@ -20,9 +21,9 @@ export default function ReceiveDialog({
      const copyToClipboard = async () => {
           try {
                await navigator.clipboard.writeText(address);
-               alert("Copied");
+               toast.success("Copied.")
           } catch (err) {
-               console.error("Failed to copy text:", err);
+               toast.error("Failed to copy.")
           }
      };
 

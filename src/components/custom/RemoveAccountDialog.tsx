@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { removeAccount, type Account } from "@/slices/appSlice";
 import { useAppDispatch } from "@/store/hooks";
+import { toast } from "sonner";
 
 type RemoveAccountDialogProps = {
     activeAccount: Account;
@@ -25,9 +26,10 @@ export default function RemoveAccountDialog({
     const handleRemoveAccount = () => {
         try {
             dispatch(removeAccount(activeAccount.accountIdx));
+            toast.success("Account removed successfully.")
             onOpenChange(false);
-        } catch (err) {
-            console.error("Error in removing account: ", err);
+        } catch (err: any) {
+            toast.error(err);
         }
     }
 

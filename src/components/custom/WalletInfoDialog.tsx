@@ -9,6 +9,7 @@ import { updateWallet, type Wallet } from "@/slices/appSlice";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Check, CircleAlert, Copy, Eye, EyeOff, Pencil } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { toast } from "sonner";
 
 type WalletInfoDialogProps = {
      wallet: Wallet;
@@ -42,15 +43,16 @@ export default function WalletInfoDialog({
      const copyToClipboard = async (text: string) => {
           try {
                await navigator.clipboard.writeText(text);
-               alert("Copied");
+               toast.success("Copied.");
           } catch (err) {
-               console.error("Failed to copy text:", err);
+               toast.error("Failed to copy.");
           }
      };
 
      const toggleEditting = () => {
           if (editting) {
                dispatch(updateWallet({ accountIdx: activeAccountIdx, walletType: activeWalletType, walletIdx, name: newName }));
+               toast.success("Wallet updated successfully.")
                setEditting(false);
           } else {
                setEditting(true);

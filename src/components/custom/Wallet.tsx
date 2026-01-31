@@ -16,6 +16,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { useEffect, useState } from "react";
 import { fetchBalance, type Wallet } from "@/slices/appSlice";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { toast } from "sonner";
 
 const chainLogos = {
      "ETH": "/chains/eth.svg",
@@ -51,8 +52,9 @@ export default function Wallet({
           setRefetching(true);
           try {
                await dispatch(fetchBalance({ walletType: type, walletAddress: address }));
-          } catch (err) {
-               console.error(err);
+               toast.success("Balance refreshed successfully.")
+          } catch (err: any) {
+               toast.error(err);
           } finally {
                setRefetching(false);
           }

@@ -7,14 +7,17 @@ import { Toaster } from 'sonner';
 import { Provider } from 'react-redux';
 import { persistor, store } from './store';
 import { PersistGate } from 'redux-persist/integration/react';
+import { ThemeProvider } from './providers/ThemeProvider.tsx';
 window.Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <Toaster />
-      <App />
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <Toaster />
+        <App />
+      </ThemeProvider>
     </PersistGate>
   </Provider>
   // </StrictMode>

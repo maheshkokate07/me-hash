@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { removeAccount, type Account } from "@/slices/appSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { toast } from "sonner";
+import { getInitials } from "@/utils/string/getInitials";
 
 type RemoveAccountDialogProps = {
     activeAccount: Account;
@@ -21,7 +22,6 @@ export default function RemoveAccountDialog({
 }: RemoveAccountDialogProps) {
 
     const dispatch = useAppDispatch();
-    const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").toUpperCase();
 
     const handleRemoveAccount = () => {
         try {

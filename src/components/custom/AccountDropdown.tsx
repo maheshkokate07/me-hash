@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { setActiveAccount } from "@/slices/appSlice"
 import { ChevronsUpDown, Plus, Settings } from "lucide-react"
+import { getInitials } from "@/utils/string/getInitials"
 
 export function AccountDropdown({
      onAddAccount,
@@ -38,16 +39,16 @@ export function AccountDropdown({
 
      const isAccountEmpty = activeAccount?.solWallets.length === 0 && activeAccount?.ethWallets.length === 0;
 
-     const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").toUpperCase();
-
      return (
           <div className="flex items-center justify-center gap-2">
                <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                          <div className="flex items-center gap-2 cursor-pointer">
                               <Avatar className="h-10 w-10">
-                                   <AvatarFallback className="flex hover:bg-gray-200 transition items-center justify-center text-sm font-semibold leading-none">
-                                        {activeAccount ? getInitials(activeAccount.name) : "NA"}
+                                   <AvatarFallback className="flex items-center justify-center text-sm font-semibold leading-none bg-muted text-foreground hover:bg-accent transition">
+                                        {activeAccount
+                                             ? getInitials(activeAccount.name)
+                                             : "NA"}
                                    </AvatarFallback>
                               </Avatar>
 
@@ -142,7 +143,8 @@ export function AccountDropdown({
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
-                                             className="py-2 px-4 focus:bg-red-100 text-red-600 focus:text-red-700"
+                                             variant="destructive"
+                                             className="py-2 px-4"
                                              onSelect={(e) => {
                                                   e.preventDefault();
                                                   onRemoveAccount();

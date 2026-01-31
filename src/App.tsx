@@ -9,6 +9,7 @@ import Wallet from "./components/custom/Wallet";
 import WalletInfoDialog from "./components/custom/WalletInfoDialog";
 import ReceiveDialog from "./components/custom/ReceiveDialog";
 import RemoveAccountDialog from "./components/custom/RemoveAccountDialog";
+import { toast } from "sonner";
 
 export default function App() {
   const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx } = useAppSelector((state) => state.app);
@@ -57,6 +58,7 @@ export default function App() {
   const openAddWallet = () => setAddWalletOpen(true);
   const openWalletInfo = () => setWalletInfoOpen(true);
   const openReceive = () => setReceiveOpen(true);
+  const openSend = () => toast.warning("Coming soon...");
 
   const openRemoveAccount = () => setRemoveAccountOpen(true);
 
@@ -78,7 +80,7 @@ export default function App() {
       {
         activeAccount && activeWalletIdx === -1 ?
           <EmptyAccount activeWalletType={activeWalletType} openAddWallet={openAddWallet} /> :
-          <Wallet wallet={activeWallet} onManage={openWalletInfo} onReceive={openReceive} />
+          <Wallet wallet={activeWallet} onManage={openWalletInfo} onSend={openSend} onReceive={openReceive} />
       }
 
       <AddAccountDialog

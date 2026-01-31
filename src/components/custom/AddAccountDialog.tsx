@@ -254,7 +254,7 @@ export function AddAccountDialog({
                                                        newWords[idx] = e.target.value;
                                                        setMnemonic(newWords);
                                                   }}
-                                                  className="text-center disabled:opacity-100"
+                                                  className="text-center disabled:opacity-100 h-11"
                                                   onPaste={handlePaste}
                                                   placeholder={`${idx + 1}`}
                                              />

@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAppDispatch } from "@/store/hooks";
 import { createAccount, recoverWallets, updateAccount } from "@/slices/appSlice";
-import { ClipboardPaste, EraserIcon, Eye, EyeOff } from "lucide-react";
+import { CircleAlert, ClipboardPaste, Copy, EraserIcon, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { AppSpinner } from "./Spinner";
 
@@ -23,6 +23,8 @@ type AddAccountDialogProps = {
      recoverOnly?: boolean;
      addOnly?: boolean;
      updateOnly?: boolean;
+     showMnemonicOnly?: boolean;
+     accountMnemonic?: string;
      accountName?: string;
      accountIdx?: number;
 };
@@ -33,6 +35,8 @@ export function AddAccountDialog({
      recoverOnly,
      addOnly,
      updateOnly,
+     showMnemonicOnly,
+     accountMnemonic,
      accountName,
      accountIdx
 }: AddAccountDialogProps) {
@@ -51,7 +55,12 @@ export function AddAccountDialog({
                } else {
                     setName("");
                }
-               setMnemonic(Array(12).fill(""));
+               if (showMnemonicOnly && accountMnemonic) {
+                    const words = accountMnemonic.trim().split(/\s+/);
+                    setMnemonic(words);
+               } else {
+                    setMnemonic(Array(12).fill(""));
+               }
                setHidden(true);
                if (recoverOnly) {
                     setRecover(true);
@@ -120,20 +129,31 @@ export function AddAccountDialog({
           }
      };
 
+     const copyMnemonic = async () => {
+          try {
+               await navigator.clipboard.writeText(mnemonic.join(" "));
+               alert("Copied");
+          } catch (err) {
+               console.error("Failed to copy mnemonic:", err);
+          }
+     }
+
      const clearMnemonic = () => setMnemonic(Array(12).fill(""));
      const toggleHidden = () => setHidden((prev) => !prev);
 
      let title = "Add new account";
      let buttonText = "Add";
 
-     if (recoverOnly) {
-          title = "Recover existing wallets";
+     if (showMnemonicOnly && recoverOnly) {
+          title = "Your Recovery Phrase"
+     } else if (recoverOnly) {
+          title = "Recover Existing Wallets";
           buttonText = "Recover";
      } else if (addOnly) {
-          title = "Add new account";
+          title = "Add New Account";
           buttonText = "Add";
      } else if (updateOnly) {
-          title = "Update account name";
+          title = "Update Account Name";
           buttonText = "Update"
      } else {
           title = recover ? "Recover existing wallets" : "Add new account";
@@ -144,7 +164,10 @@ export function AddAccountDialog({
           <Dialog open={open} onOpenChange={onOpenChange}>
                <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
-                         <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
+                         <DialogTitle className={`text-xl font-semibold ${showMnemonicOnly && 'text-center'}`}>{title}</DialogTitle>
+                         {
+                              showMnemonicOnly && <DialogTitle className="text-center text-muted-foreground text-sm font-normal">Use these 12 words to recover your wallets of this account.</DialogTitle>
+                         }
                     </DialogHeader>
 
                     <div className="grid gap-4 py-2">
@@ -192,8 +215,10 @@ export function AddAccountDialog({
                                         <MnemonicControls
                                              pasteMnemonic={pasteMnemonic}
                                              clearMnemonic={clearMnemonic}
+                                             copyMnemonic={copyMnemonic}
                                              hidden={hidden}
                                              toggleHidden={toggleHidden}
+                                             showMnemonicOnly={false}
                                         />
                                    )}
                               </div>
@@ -204,8 +229,10 @@ export function AddAccountDialog({
                               <MnemonicControls
                                    pasteMnemonic={pasteMnemonic}
                                    clearMnemonic={clearMnemonic}
+                                   copyMnemonic={copyMnemonic}
                                    hidden={hidden}
                                    toggleHidden={toggleHidden}
+                                   showMnemonicOnly={showMnemonicOnly ? true : false}
                               />
                          )}
 
@@ -218,26 +245,34 @@ export function AddAccountDialog({
                                                   type={hidden ? "password" : "text"}
                                                   key={idx}
                                                   value={word}
+                                                  disabled={showMnemonicOnly}
                                                   onChange={(e) => {
                                                        const newWords = [...mnemonic];
                                                        newWords[idx] = e.target.value;
                                                        setMnemonic(newWords);
                                                   }}
-                                                  className="text-center"
+                                                  className="text-center disabled:opacity-100"
                                                   onPaste={handlePaste}
                                                   placeholder={`${idx + 1}`}
                                              />
                                         ))}
                                    </div>
-                                   <p className="text-xs text-muted-foreground">
-                                        Type or paste your 12 word mnemonic phrase.
+                                   <p className="text-xs flex items-center gap-1 text-muted-foreground ml-1">
+                                        {showMnemonicOnly ? (
+                                             <>
+                                                  <CircleAlert className="h-4 w-4" />
+                                                  <span>Never share your private key or enter it into an app or website.</span>
+                                             </>
+                                        ) : (
+                                             <span>Type or paste your 12 word mnemonic phrase.</span>
+                                        )}
                                    </p>
                               </>
                          )}
                     </div>
 
                     {/* Footer */}
-                    <DialogFooter>
+                    {!showMnemonicOnly && <DialogFooter>
                          <DialogClose asChild>
                               <Button variant="outline">Cancel</Button>
                          </DialogClose>
@@ -258,7 +293,7 @@ export function AddAccountDialog({
                                    buttonText
                               )}
                          </Button>
-                    </DialogFooter>
+                    </DialogFooter>}
                </DialogContent>
           </Dialog>
      );
@@ -267,33 +302,50 @@ export function AddAccountDialog({
 function MnemonicControls({
      pasteMnemonic,
      clearMnemonic,
+     copyMnemonic,
      hidden,
-     toggleHidden,
+     showMnemonicOnly,
+     toggleHidden
 }: {
      pasteMnemonic: () => void;
      clearMnemonic: () => void;
+     copyMnemonic: () => void;
      hidden: boolean;
+     showMnemonicOnly: boolean;
      toggleHidden: () => void;
 }) {
      return (
           <div className="flex items-center gap-2 justify-end">
-               <Tooltip>
-                    <TooltipTrigger asChild>
-                         <Button variant="outline" className="cursor-pointer" onClick={pasteMnemonic}>
-                              <ClipboardPaste />
-                         </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Paste</TooltipContent>
-               </Tooltip>
+               {
+                    showMnemonicOnly ?
+                         <Tooltip>
+                              <TooltipTrigger asChild>
+                                   <Button variant="outline" className="cursor-pointer" onClick={copyMnemonic}>
+                                        <Copy />
+                                   </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Copy</TooltipContent>
+                         </Tooltip> :
+                         <>
+                              <Tooltip>
+                                   <TooltipTrigger asChild>
+                                        <Button variant="outline" className="cursor-pointer" onClick={pasteMnemonic}>
+                                             <ClipboardPaste />
+                                        </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Paste</TooltipContent>
+                              </Tooltip>
 
-               <Tooltip>
-                    <TooltipTrigger asChild>
-                         <Button variant="outline" className="cursor-pointer" onClick={clearMnemonic}>
-                              <EraserIcon />
-                         </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Clear</TooltipContent>
-               </Tooltip>
+                              <Tooltip>
+                                   <TooltipTrigger asChild>
+                                        <Button variant="outline" className="cursor-pointer" onClick={clearMnemonic}>
+                                             <EraserIcon />
+                                        </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>Clear</TooltipContent>
+                              </Tooltip>
+                         </>
+               }
 
                <Tooltip>
                     <TooltipTrigger asChild>

@@ -15,6 +15,7 @@ export default function App() {
   const [addAccountOpen, setAddAccountOpen] = useState(false);
   const [updateOnly, setUpdateOnly] = useState(false);
   const [recoverOnly, setRecoverOnly] = useState(false);
+  const [showMnemonicOnly, setShowMnemonicOnly] = useState(false);
   const [addWalletOpen, setAddWalletOpen] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
@@ -22,16 +23,25 @@ export default function App() {
   const openAddAccount = () => {
     setUpdateOnly(false);
     setRecoverOnly(false);
+    setShowMnemonicOnly(false);
     setAddAccountOpen(true);
   }
   const openUpdateAccount = () => {
     setUpdateOnly(true);
     setRecoverOnly(false);
+    setShowMnemonicOnly(false);
     setAddAccountOpen(true);
   }
   const openRecoverAccount = () => {
     setUpdateOnly(false);
     setRecoverOnly(true);
+    setShowMnemonicOnly(false);
+    setAddAccountOpen(true);
+  }
+  const openShowMnemonic = () => {
+    setRecoverOnly(true);
+    setUpdateOnly(false);
+    setShowMnemonicOnly(true);
     setAddAccountOpen(true);
   }
   const openAddWallet = () => setAddWalletOpen(true);
@@ -51,7 +61,7 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openAddWallet={openAddWallet} />
+      <Header openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openShowMnemonic={openShowMnemonic} openAddWallet={openAddWallet} />
 
       {
         activeAccount && activeWalletIdx === -1 ?
@@ -64,6 +74,8 @@ export default function App() {
         onOpenChange={setAddAccountOpen}
         updateOnly={updateOnly}
         recoverOnly={recoverOnly}
+        showMnemonicOnly={showMnemonicOnly}
+        accountMnemonic={showMnemonicOnly ? activeAccount?.mnemonic : undefined}
         accountIdx={(recoverOnly || updateOnly) ? activeAccountIdx : undefined}
         accountName={activeAccount?.name}
       />

@@ -19,11 +19,13 @@ import { ChevronsUpDown, Plus, Settings } from "lucide-react"
 export function AccountDropdown({
      onAddAccount,
      onUpdateAccount,
-     onRecoverAccount
+     onRecoverAccount,
+     onShowMnemonic
 }: {
      onAddAccount: () => void,
      onUpdateAccount: () => void,
      onRecoverAccount: () => void
+     onShowMnemonic: () => void
 }) {
      const dispatch = useAppDispatch()
      const { accounts, activeAccountIdx } = useAppSelector(state => state.app);
@@ -125,6 +127,8 @@ export function AccountDropdown({
                                                   e.preventDefault();
                                                   if (isAccountEmpty) {
                                                        onRecoverAccount();
+                                                  } else {
+                                                       onShowMnemonic();
                                                   }
                                              }}
                                         >

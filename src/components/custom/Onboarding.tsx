@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { AddAccountDialog } from "./AddAccountDialog";
 import Footer from "./Footer";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { EarthLock } from "lucide-react";
 
 export default function Onboarding({ footerHeight }: { footerHeight: string }) {
      const [addAccountOpen, setAddAccountOpen] = useState(false);
@@ -29,11 +31,7 @@ export default function Onboarding({ footerHeight }: { footerHeight: string }) {
                     <div className="w-full max-w-xl h-full max-h-110 flex flex-col items-center justify-between text-center">
                          <div className="flex flex-col items-center gap-5">
                               {/* Logo */}
-                              <div className="h-24 w-24 rounded-full bg-muted border border-border flex items-center justify-center">
-                                   <span className="text-3xl font-bold text-foreground select-none">
-                                        MH
-                                   </span>
-                              </div>
+                              <EarthLock size="78" />
 
                               {/* Title */}
                               <h1 className="text-3xl sm:text-4xl font-semibold text-foreground">

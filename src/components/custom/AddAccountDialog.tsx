@@ -267,7 +267,7 @@ export function AddAccountDialog({
                                                   <span>Never share your private key or enter it into an app or website.</span>
                                              </>
                                         ) : (
-                                             <span>Type or paste your 12 word mnemonic phrase.</span>
+                                             <span>Type or paste your 12 word secret recovery phrase.</span>
                                         )}
                                    </p>
                               </>

@@ -1,4 +1,4 @@
-import { Copy } from "lucide-react";
+import { Copy, EarthLock } from "lucide-react";
 import { Button } from "../ui/button";
 import { AccountDropdown } from "./AccountDropdown";
 import { ChainDropdown } from "./ChainDrodown";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ThemeToggle } from "./ThemeToggle";
 
 export default function Header({
+     headerHeight,
      openAddAccount,
      openUpdateAccount,
      openRecoverAccount,
@@ -16,6 +17,7 @@ export default function Header({
      openRemoveAccount,
      openAddWallet,
 }: {
+     headerHeight: string;
      openAddAccount: () => void;
      openUpdateAccount: () => void;
      openRecoverAccount: () => void;
@@ -46,13 +48,18 @@ export default function Header({
 
      return (
           <header
+               style={{ height: headerHeight }}
                className="w-full fixed top-0 z-50 bg-background border-b border-border flex items-center gap-2 sm:gap-4 px-5 justify-between"
-               style={{ height: "64px" }}
           >
                {/* Left */}
-               <div className="flex flex-1 items-center justify-start gap-4 h-full">
+               <div className="flex flex-1 items-center justify-start gap-5 h-full">
                     <h1 className="text-2xl font-bold select-none hidden sm:block text-foreground">
-                         MeHash
+                         <span className="flex items-center gap-3">
+                              <EarthLock size="34" />
+                              <span className="hidden md:block">
+                                   MeHash
+                              </span>
+                         </span>
                     </h1>
 
                     <div className="border-r border-border h-full hidden sm:block" />

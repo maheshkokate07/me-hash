@@ -1,6 +1,9 @@
-export default function Footer() {
+export default function Footer({ footerHeight }: { footerHeight: string }) {
     return (
-        <footer className="border-t border-muted flex px-5 justify-left items-center h-14">
+        <footer
+            style={{ height: footerHeight }}
+            className="border-t border-muted flex px-5 justify-left items-center"
+        >
             <p className="text-sm text-muted-foreground">
                 Designed and Developed by{" "}
                 <a

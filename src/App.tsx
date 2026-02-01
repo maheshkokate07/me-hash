@@ -10,6 +10,7 @@ import WalletInfoDialog from "./components/custom/WalletInfoDialog";
 import ReceiveDialog from "./components/custom/ReceiveDialog";
 import RemoveAccountDialog from "./components/custom/RemoveAccountDialog";
 import { toast } from "sonner";
+import Footer from "./components/custom/Footer";
 
 export default function App() {
   const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx } = useAppSelector((state) => state.app);
@@ -74,14 +75,18 @@ export default function App() {
 
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Header openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openShowMnemonic={openShowMnemonic} openRemoveAccount={openRemoveAccount} openAddWallet={openAddWallet} />
 
-      {
-        activeAccount && activeWalletIdx === -1 ?
-          <EmptyAccount activeWalletType={activeWalletType} openAddWallet={openAddWallet} /> :
-          <Wallet wallet={activeWallet} onManage={openWalletInfo} onSend={openSend} onReceive={openReceive} />
-      }
+      <div className="flex-1 pt-16">
+        {
+          activeAccount && activeWalletIdx === -1 ?
+            <EmptyAccount activeWalletType={activeWalletType} openAddWallet={openAddWallet} /> :
+            <Wallet wallet={activeWallet} onManage={openWalletInfo} onSend={openSend} onReceive={openReceive} />
+        }
+      </div>
+
+      <Footer />
 
       <AddAccountDialog
         open={addAccountOpen}

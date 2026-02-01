@@ -260,7 +260,7 @@ export function AddAccountDialog({
                                              />
                                         ))}
                                    </div>
-                                   <p className="text-xs flex items-center gap-1 text-muted-foreground ml-1">
+                                   <p className="text-xs flex items-center gap-1 text-muted-foreground">
                                         {showMnemonicOnly ? (
                                              <>
                                                   <CircleAlert className="h-4 w-4" />

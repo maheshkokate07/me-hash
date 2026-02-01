@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { AddAccountDialog } from "./AddAccountDialog";
 import Footer from "./Footer";
-import { Avatar, AvatarFallback } from "../ui/avatar";
 import { EarthLock } from "lucide-react";
 
 export default function Onboarding({ footerHeight }: { footerHeight: string }) {

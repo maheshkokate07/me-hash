@@ -37,7 +37,7 @@ export default function ReceiveDialog({
                     </DialogHeader>
 
                     <div className="text-center flex items-center flex-col gap-6 mt-4">
-                         <p className="break-all w-64 sm:w-80 text-[20px] font-mono bg-muted text-foreground p-3 rounded-md border border-border">
+                         <p className="break-all w-64 sm:w-80 text-[17px] sm:text-[20px] font-mono bg-muted text-foreground p-3 rounded-md border border-border">
                               {address}
                          </p>
 

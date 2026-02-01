@@ -8,7 +8,7 @@ import { Spinner } from "@/components/ui/spinner"
 
 export function AppSpinner({ text }: { text?: string }) {
      return (
-          <div className="flex w-full max-w-xs flex-col gap-4 [--radius:1rem]">
+          <div className="flex w-full items-center justify-center h-full max-w-xs flex-col gap-4 [--radius:1rem]">
                <Item>
                     <ItemMedia>
                          <Spinner />

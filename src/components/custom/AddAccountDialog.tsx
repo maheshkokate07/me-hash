@@ -281,6 +281,7 @@ export function AddAccountDialog({
                          </DialogClose>
 
                          <Button
+                              className="flex items-center justify-center"
                               onClick={handleAdd}
                               disabled={
                                    (updateOnly && !name.trim()) ||

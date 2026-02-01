@@ -8,15 +8,13 @@ import { Spinner } from "@/components/ui/spinner"
 
 export function AppSpinner({ text }: { text?: string }) {
      return (
-          <div className="flex w-full items-center justify-center h-full max-w-xs flex-col gap-4 [--radius:1rem]">
-               <Item>
-                    <ItemMedia>
-                         <Spinner />
-                    </ItemMedia>
-                    {text && <ItemContent>
-                         <ItemTitle className="line-clamp-1">{text}</ItemTitle>
-                    </ItemContent>}
-               </Item>
-          </div>
+          <Item className="flex gap-2">
+               <ItemMedia>
+                    <Spinner />
+               </ItemMedia>
+               {text && <ItemContent>
+                    <ItemTitle className="line-clamp-1">{text}</ItemTitle>
+               </ItemContent>}
+          </Item>
      )
 }

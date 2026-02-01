@@ -291,8 +291,8 @@ export function AddAccountDialog({
                                    creating
                               }
                          >
-                              {!creating ? (
-                                   <AppSpinner text={updateOnly ? "Updating..." : (recover || recoverOnly) ? "Recovering..." : "Creating..."} />
+                              {creating ? (
+                                   <AppSpinner text={updateOnly ? "Updating..." : (recover || recoverOnly) ? "Recovering..." : "Adding..."} />
                               ) : (
                                    buttonText
                               )}

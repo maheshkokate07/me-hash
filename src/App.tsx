@@ -89,7 +89,7 @@ export default function App() {
         }
       </div>
 
-      <Footer footerHeight={footerHeight} />
+      <Footer footerHeight={footerHeight} position="left" />
 
       <AddAccountDialog
         open={addAccountOpen}

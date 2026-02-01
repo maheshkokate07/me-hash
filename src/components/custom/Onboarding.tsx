@@ -74,7 +74,7 @@ export default function Onboarding({ footerHeight }: { footerHeight: string }) {
                          />
                     </div>
                </div>
-               <Footer footerHeight={footerHeight} />
+               <Footer footerHeight={footerHeight} position="center" />
           </>
      );
 }

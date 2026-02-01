@@ -96,7 +96,7 @@ export function AddAccountDialog({
                } else if (addOnly || (!recoverOnly && !recover && !updateOnly)) {
                     await dispatch(createAccount({ name: name.trim() || undefined })).unwrap();
                     toast.success("Account created successfully.")
-               } else if (updateOnly && accountIdx) {
+               } else if (updateOnly && (accountIdx !== undefined && accountIdx !== -1)) {
                     await dispatch(updateAccount({ accountIdx, name }));
                     toast.success("Account updated successfully.")
                }

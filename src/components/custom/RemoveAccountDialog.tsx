@@ -50,7 +50,7 @@ export default function RemoveAccountDialog({
                     </Avatar>
 
                     {/* Subtitle */}
-                    {activeAccount.mnemonic && <p className="text-sm sm:text-md text-muted-foregrounda max-w-sm leading-relaxed text-center">
+                    {activeAccount.mnemonic && <p className="text-sm sm:text-md text-muted-foreground max-w-sm leading-relaxed text-center">
                         This will remove all the wallets you have created or imported. Make sure you have your existing secret recovery phrase and private keys saved.
                     </p>}
                 </div>

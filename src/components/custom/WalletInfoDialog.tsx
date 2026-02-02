@@ -2,7 +2,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { updateWallet, type Wallet } from "@/slices/appSlice";
@@ -38,7 +38,7 @@ export default function WalletInfoDialog({
 
      const [showPrivateKey, setShowPrivateKey] = useState(false);
      const [editting, setEditting] = useState(false);
-     const [newName, setNewName] = useState(name);
+     const [newName, setNewName] = useState("");
 
      const toogleShowPrivateKey = () =>
           setShowPrivateKey((prev) => !prev);
@@ -68,6 +68,12 @@ export default function WalletInfoDialog({
                setEditting(true);
           }
      };
+
+     useEffect(() => {
+          setNewName(name);
+          setEditting(false);
+          setShowPrivateKey(false);
+     }, [wallet]);
 
      return (
           <Dialog open={open} onOpenChange={onOpenChange}>

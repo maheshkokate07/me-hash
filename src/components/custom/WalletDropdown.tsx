@@ -35,7 +35,7 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
                               className="h-full cursor-pointer px-3 rounded-none flex items-center hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                          >
                               <span className="h-6 flex items-center justify-center gap-1.5">
-                                   <span className={`${activeWalletIdx !== -1 ? 'w-18 sm:w-28 md:w-30' : 'w-25'} truncate`}>
+                                   <span className={`${activeWalletIdx !== -1 ? 'max-w-18 sm:min-w-18 sm:max-w-28 md:max-w-30' : 'w-25'} truncate`}>
                                         {activeWalletIdx !== -1 ? `${activeWallet.name}` : `No ${activeWalletType} Wallets`}
                                    </span>
                                    {activeWalletIdx !== -1 && <ChevronsUpDown className="text-gray-500" />}
@@ -64,7 +64,7 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
 
                                              <div className="flex flex-col overflow-hidden gap-0.5">
                                                   <span className="text-sm font-medium">{`${wallet.name}`}</span>
-                                                  <span className="text-xs text-gray-400 truncate">{wallet.address}</span>
+                                                  <span className="text-xs text-muted-foreground truncate">{wallet.address}</span>
                                              </div>
                                         </DropdownMenuItem>
                                    )

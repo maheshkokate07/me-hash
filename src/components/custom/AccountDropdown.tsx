@@ -52,7 +52,7 @@ export function AccountDropdown({
                                    </AvatarFallback>
                               </Avatar>
 
-                              <Button variant="outline" className="cursor-pointer hide text-gray-500 h-10 w-8">
+                              <Button variant="outline" className="cursor-pointer hide text-muted-foreground h-10 w-8">
                                    <ChevronsUpDown />
                               </Button>
                          </div>
@@ -80,7 +80,7 @@ export function AccountDropdown({
 
                                              <div className="flex flex-col">
                                                   <span className="text-sm font-medium truncate w-44">{account.name}</span>
-                                                  <span className="text-xs text-gray-400">{totalWallets} {totalWallets === 1 ? "wallet" : "wallets"}</span>
+                                                  <span className="text-xs text-muted-foreground">{totalWallets} {totalWallets === 1 ? "wallet" : "wallets"}</span>
                                              </div>
                                         </DropdownMenuItem>
                                    )

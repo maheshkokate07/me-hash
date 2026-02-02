@@ -12,7 +12,7 @@ import RemoveAccountDialog from "./components/custom/RemoveAccountDialog";
 import { toast } from "sonner";
 import Footer from "./components/custom/Footer";
 
-const headerHeight = "64px";
+const headerHeight = "68px";
 const footerHeight = "56px";
 
 export default function App() {

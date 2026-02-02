@@ -95,7 +95,7 @@ export function AddAccountDialog({
                     toast.success("Wallets recovered successfully.")
                } else if (addOnly || (!recoverOnly && !recover && !updateOnly)) {
                     await dispatch(createAccount({ name: name.trim() || undefined })).unwrap();
-                    toast.success("Account created successfully.")
+                    toast.success("Account added successfully.")
                } else if (updateOnly && (accountIdx !== undefined && accountIdx !== -1)) {
                     await dispatch(updateAccount({ accountIdx, name }));
                     toast.success("Account updated successfully.")

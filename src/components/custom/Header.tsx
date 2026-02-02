@@ -42,7 +42,7 @@ export default function Header({
      const copyCurrentAddress = () => {
           if (activeWallet?.address) {
                navigator.clipboard.writeText(activeWallet.address);
-               toast.success("Copied.");
+               toast.success("Wallet address copied.");
           }
      };
 
@@ -89,7 +89,7 @@ export default function Header({
                                    variant="ghost"
                                    disabled={!activeWallet}
                                    onClick={copyCurrentAddress}
-                                   className="h-full px-3 rounded-none flex items-center cursor-pointer hover:bg-accent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                                   className="h-full px-3 rounded-none flex items-center cursor-pointer hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                               >
                                    <span className="h-6 flex items-center justify-center gap-1.5">
                                         <Copy className="text-muted-foreground" />

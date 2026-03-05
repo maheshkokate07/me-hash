@@ -1,4 +1,4 @@
-import type { networkType, Wallet } from '@/slices/appSlice';
+import type { Wallet } from '@/slices/appSlice';
 import { Keypair } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import slip10 from 'micro-key-producer/slip10.js';

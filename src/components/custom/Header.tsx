@@ -6,7 +6,7 @@ import { WalletDropdown } from "./WalletDropdown";
 import { useAppSelector } from "@/store/hooks";
 import type { Wallet } from "@/slices/appSlice";
 import { toast } from "sonner";
-import { ThemeToggle } from "./ThemeToggle";
+import SettingsPanel from "./SettingsPanel";
 
 export default function Header({
      headerHeight,
@@ -101,7 +101,8 @@ export default function Header({
 
                {/* Right */}
                <div className="flex items-center justify-end gap-2.5 flex-1 h-10">
-                    <ThemeToggle />
+                    {/* <ThemeToggle /> */}
+                    <SettingsPanel headerHeight={headerHeight} />
                </div>
           </header>
      );

@@ -123,7 +123,7 @@
   }
 }
 
-@media (max-width: 499px) {
+@media (max-width: 450px) {
   .hide {
     display: none;
   }
@@ -138,4 +138,15 @@
   margin-left: 2px;
   height: 22px;
   width: 22px;
+}
+
+.panel-switch {
+  height: 24px;
+  width: 42px;
+}
+
+.panel-switch>span {
+  margin-left: 1px;
+  height: 20px;
+  width: 20px;
 }

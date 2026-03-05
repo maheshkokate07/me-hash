@@ -1,7 +1,7 @@
+import type { networkType, Wallet } from '@/slices/appSlice';
 import { Keypair } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import slip10 from 'micro-key-producer/slip10.js';
-import type { Wallet } from '../../slices/appSlice';
 
 export const createSolWallet = (mnemonic: string, walletIdx: number = 0): Wallet => {
      if (!bip39.validateMnemonic(mnemonic)) {
@@ -22,9 +22,20 @@ export const createSolWallet = (mnemonic: string, walletIdx: number = 0): Wallet
                address: keyPair.publicKey.toBase58(),
                privateKey: Buffer.from(keyPair.secretKey).toString("hex"),
                path,
-               balance: 0,
-               balanceUsd: 0,
-               lastUpdated: Date.now()
+               MAINNET: {
+                    balance: 0,
+                    balanceUsd: 0,
+                    lastBalanceFetched: Date.now(),
+                    signatures: [],
+                    lastSignaturesFetched: Date.now()
+               },
+               DEVNET: {
+                    balance: 0,
+                    balanceUsd: 0,
+                    lastBalanceFetched: Date.now(),
+                    signatures: [],
+                    lastSignaturesFetched: Date.now()
+               }
           }
      } catch (err: any) {
           throw err;

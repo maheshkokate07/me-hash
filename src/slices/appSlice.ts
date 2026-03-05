@@ -6,8 +6,6 @@ import { importWalletsByMnemonic } from "../utils/wallets/importByMnemonic";
 import { getEthBalance } from "@/utils/eth/getEthBalance";
 import { getSolBalance } from "@/utils/sol/getSolBalance";
 import { getSolSignatures } from "@/utils/sol/getSolSignatures";
-import { getSolConnection } from "@/utils/sol/getSolConnection";
-import { getEthConnection } from "@/utils/eth/getEthConnection";
 import { getEthSignatures } from "@/utils/eth/getEthSignatures";
 
 type walletType = 'SOL' | 'ETH';

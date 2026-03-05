@@ -3,7 +3,7 @@ import {
      Sheet,
      SheetClose,
      SheetContent,
-     SheetDescription,
+     // SheetDescription,
      SheetFooter,
      SheetHeader,
      SheetTitle,

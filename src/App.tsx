@@ -11,15 +11,15 @@ import ReceiveDialog from "./components/custom/ReceiveDialog";
 import RemoveAccountDialog from "./components/custom/RemoveAccountDialog";
 import { toast } from "sonner";
 import Footer from "./components/custom/Footer";
-
 const headerHeight = "68px";
 const footerHeight = "56px";
 
 export default function App() {
-  const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx } = useAppSelector((state) => state.app);
+  const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx, activeNetwork } = useAppSelector(state => state.app);
+
+  console.log(useAppSelector(state => state.app));
 
   const [addAccountOpen, setAddAccountOpen] = useState(false);
-
   const [updateOnly, setUpdateOnly] = useState(false);
   const [recoverOnly, setRecoverOnly] = useState(false);
   const [showMnemonicOnly, setShowMnemonicOnly] = useState(false);
@@ -81,13 +81,15 @@ export default function App() {
     <div className="min-h-screen flex flex-col">
       <Header headerHeight={headerHeight} openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openShowMnemonic={openShowMnemonic} openRemoveAccount={openRemoveAccount} openAddWallet={openAddWallet} />
 
+
       <div className="flex-1" style={{ paddingTop: headerHeight }}>
         {
           activeAccount && activeWalletIdx === -1 ?
             <EmptyAccount headerHeight={headerHeight} footerHeight={footerHeight} activeWalletType={activeWalletType} openAddWallet={openAddWallet} /> :
-            <Wallet wallet={activeWallet} onManage={openWalletInfo} onSend={openSend} onReceive={openReceive} />
+            <Wallet wallet={activeWallet} onManage={openWalletInfo} onSend={openSend} onReceive={openReceive} activeNetwork={activeNetwork} />
         }
       </div>
+
 
       <Footer footerHeight={footerHeight} position="left" />
 

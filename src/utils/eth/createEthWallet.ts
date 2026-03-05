@@ -1,6 +1,6 @@
+import type { Wallet } from '@/slices/appSlice';
 import * as bip39 from 'bip39';
 import { HDNodeWallet } from "ethers";
-import type { Wallet } from '../../slices/appSlice';
 
 export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet => {
      if (!bip39.validateMnemonic(mnemonic)) {
@@ -18,9 +18,20 @@ export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet
                address: wallet.address,
                privateKey: wallet.privateKey,
                path: path,
-               balance: 0,
-               balanceUsd: 0,
-               lastUpdated: Date.now()
+               MAINNET: {
+                    balance: 0,
+                    balanceUsd: 0,
+                    lastBalanceFetched: Date.now(),
+                    signatures: [],
+                    lastSignaturesFetched: Date.now()
+               },
+               DEVNET: {
+                    balance: 0,
+                    balanceUsd: 0,
+                    lastBalanceFetched: Date.now(),
+                    signatures: [],
+                    lastSignaturesFetched: Date.now()
+               }
           }
      } catch (err: any) {
           throw err;

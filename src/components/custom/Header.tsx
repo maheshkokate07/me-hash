@@ -1,4 +1,4 @@
-import { Copy, EarthLock } from "lucide-react";
+import { Copy, EarthLock, Settings } from "lucide-react";
 import { Button } from "../ui/button";
 import { AccountDropdown } from "./AccountDropdown";
 import { ChainDropdown } from "./ChainDrodown";
@@ -7,6 +7,7 @@ import { useAppSelector } from "@/store/hooks";
 import type { Wallet } from "@/slices/appSlice";
 import { toast } from "sonner";
 import { ThemeToggle } from "./ThemeToggle";
+import SettingsPanel from "./SettingsPanel";
 
 export default function Header({
      headerHeight,
@@ -101,7 +102,8 @@ export default function Header({
 
                {/* Right */}
                <div className="flex items-center justify-end gap-2.5 flex-1 h-10">
-                    <ThemeToggle />
+                    {/* <ThemeToggle /> */}
+                    <SettingsPanel />
                </div>
           </header>
      );

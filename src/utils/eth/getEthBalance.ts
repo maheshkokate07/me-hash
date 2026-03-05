@@ -1,9 +1,16 @@
 import { ethers } from "ethers";
-import { ethConnection } from "./connection";
 import { getTokenPrice } from "../price/getTokenPrice";
+import type { networkType } from "@/slices/appSlice";
+import { getEthConnection } from "./getEthConnection";
 
-export async function getEthBalance(address: string, currency: string = "usd") {
+export async function getEthBalance(
+     activeNetwork: networkType,
+     address: string,
+     currency: string = "usd"
+) {
      try {
+          const ethConnection = getEthConnection(activeNetwork);
+
           const balanceWei = await ethConnection.getBalance(address);
           const balanceEth = Number(ethers.formatEther(balanceWei));
 

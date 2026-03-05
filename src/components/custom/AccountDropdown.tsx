@@ -53,7 +53,7 @@ export function AccountDropdown({
                               </Avatar>
 
                               <Button variant="outline" className="cursor-pointer hide text-muted-foreground h-10 w-8">
-                                   <ChevronsUpDown />
+                                   <ChevronsUpDown className="scale-110" />
                               </Button>
                          </div>
                     </DropdownMenuTrigger>
@@ -115,7 +115,7 @@ export function AccountDropdown({
                                              <Settings className="h-4 w-4" />
                                         </AvatarFallback>
                                    </Avatar>
-                                   <span className="text-sm">Settings</span>
+                                   <span className="text-sm">Account Settings</span>
                               </DropdownMenuSubTrigger>
                               <DropdownMenuPortal>
                                    <DropdownMenuSubContent>

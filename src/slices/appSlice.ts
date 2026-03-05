@@ -2,11 +2,23 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
 import * as bip39 from 'bip39';
 import { createEthWallet } from "../utils/eth/createEthWallet";
 import { createSolWallet } from "../utils/sol/createSolWallet";
-import { importWalletsByMnemonic } from "../utils/wallets/importByMnumonic";
+import { importWalletsByMnemonic } from "../utils/wallets/importByMnemonic";
 import { getEthBalance } from "@/utils/eth/getEthBalance";
 import { getSolBalance } from "@/utils/sol/getSolBalance";
+import { getSolSignatures } from "@/utils/sol/getSolSignatures";
+import { getSolConnection } from "@/utils/sol/getSolConnection";
+import { getEthConnection } from "@/utils/eth/getEthConnection";
+import { getEthSignatures } from "@/utils/eth/getEthSignatures";
 
 type walletType = 'SOL' | 'ETH';
+export type networkType = "MAINNET" | "DEVNET";
+
+export interface Signature {
+    blockTime?: number | null | undefined,
+    confirmationStatus?: string | undefined,
+    signature: string,
+    slot: number
+}
 
 export interface Wallet {
     walletIdx: number;
@@ -16,9 +28,21 @@ export interface Wallet {
     privateKey: string;
     path: string;
 
-    balance: number;
-    balanceUsd: number;
-    lastUpdated: number;
+    MAINNET: {
+        balance: number;
+        balanceUsd: number;
+        lastBalanceFetched: number;
+        signatures: Signature[]
+        lastSignaturesFetched: number;
+    }
+
+    DEVNET: {
+        balance: number;
+        balanceUsd: number;
+        lastBalanceFetched: number;
+        signatures: Signature[]
+        lastSignaturesFetched: number;
+    }
     // isLoading: boolean;
 }
 
@@ -36,13 +60,15 @@ interface AppState {
     activeAccountIdx: number;
     activeWalletType: walletType;
     activeWalletIdx: number;
+    activeNetwork: networkType;
 }
 
 const initialState: AppState = {
     accounts: [],
     activeAccountIdx: -1,
     activeWalletType: 'ETH',
-    activeWalletIdx: -1
+    activeWalletIdx: -1,
+    activeNetwork: "MAINNET"
 }
 
 export const createAccount = createAsyncThunk(
@@ -156,7 +182,10 @@ export const recoverWallets = createAsyncThunk(
         }
 
         try {
-            const wallets = await importWalletsByMnemonic(mnemonic);
+            const { activeNetwork } = state.app;
+
+            const wallets = await importWalletsByMnemonic(mnemonic, activeNetwork);
+
             return { accountIdx, name, wallets, create, mnemonic, createdAt: Date.now() };
         } catch (err) {
             return rejectWithValue("Failed to recover wallets.");
@@ -166,27 +195,61 @@ export const recoverWallets = createAsyncThunk(
 
 export const fetchBalance = createAsyncThunk(
     "app/fetchBalance",
-    async (payload: { walletType: walletType, walletAddress: string }, { rejectWithValue }) => {
+    async (payload: { walletType: walletType, walletAddress: string }, { getState, rejectWithValue }) => {
         const { walletType, walletAddress } = payload;
+
+        const state = getState() as { app: AppState };
+        const { activeNetwork } = state.app;
 
         try {
             let balanceData;
 
             if (walletType === 'ETH') {
-                balanceData = await getEthBalance(walletAddress);
+                balanceData = await getEthBalance(activeNetwork, walletAddress);
             } else if (walletType === 'SOL') {
-                balanceData = await getSolBalance(walletAddress);
+                balanceData = await getSolBalance(activeNetwork, walletAddress);
             }
 
             return {
+                activeNetwork,
                 walletType,
                 walletAddress,
                 balance: balanceData?.balance,
                 balanceUsd: balanceData?.balanceUsd,
-                lastUpdated: Date.now()
+                lastBalanceFetched: Date.now()
             }
         } catch (err) {
             return rejectWithValue("Failed to fetch balance.");
+        }
+    }
+)
+
+export const fetchSignatures = createAsyncThunk(
+    "app/fetchSignatures",
+    async (payload: { walletType: walletType, walletAddress: string }, { getState, rejectWithValue }) => {
+        const { walletType, walletAddress } = payload;
+
+        const state = getState() as { app: AppState };
+        const { activeNetwork } = state.app;
+
+        try {
+            let signatures;
+
+            if (walletType === 'ETH') {
+                signatures = await getEthSignatures(walletAddress, activeNetwork);
+            } else if (walletType === 'SOL') {
+                signatures = await getSolSignatures(walletAddress, activeNetwork);
+            }
+
+            return {
+                activeNetwork,
+                walletType,
+                walletAddress,
+                signatures,
+                lastSignaturesFetched: Date.now()
+            }
+        } catch (err) {
+            return rejectWithValue("Failed to fetch signatures.");
         }
     }
 )
@@ -295,6 +358,10 @@ const appSlice = createSlice({
         setActiveWalletIdx: (state, action: PayloadAction<number>) => {
             state.activeWalletIdx = action.payload;
         },
+
+        setActiveNetwork: (state, action: PayloadAction<networkType>) => {
+            state.activeNetwork = action.payload;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -361,16 +428,31 @@ const appSlice = createSlice({
             })
             .addCase(fetchBalance.fulfilled, (state, action) => {
                 if (!action.payload) return;
-                const { walletType, walletAddress, balance, balanceUsd, lastUpdated } = action.payload;
+                const { activeNetwork, walletType, walletAddress, balance, balanceUsd, lastBalanceFetched } = action.payload;
 
                 for (let account of state.accounts) {
                     const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
 
                     for (let wallet of wallets) {
                         if (wallet.address === walletAddress) {
-                            wallet.balance = balance ?? 0;
-                            wallet.balanceUsd = balanceUsd ?? 0;
-                            wallet.lastUpdated = lastUpdated;
+                            wallet[activeNetwork].balance = balance ?? 0;
+                            wallet[activeNetwork].balanceUsd = balanceUsd ?? 0;
+                            wallet[activeNetwork].lastBalanceFetched = lastBalanceFetched;
+                        }
+                    }
+                }
+            })
+            .addCase(fetchSignatures.fulfilled, (state, action) => {
+                if (!action.payload) return;
+                const { activeNetwork, walletType, walletAddress, signatures, lastSignaturesFetched } = action.payload;
+
+                for (let account of state.accounts) {
+                    const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
+
+                    for (let wallet of wallets) {
+                        if (wallet.address === walletAddress) {
+                            wallet[activeNetwork].signatures = signatures || [];
+                            wallet[activeNetwork].lastSignaturesFetched = lastSignaturesFetched;
                         }
                     }
                 }
@@ -378,5 +460,5 @@ const appSlice = createSlice({
     }
 })
 
-export const { setActiveAccount, setActiveWalletType, setActiveWalletIdx, updateAccount, removeAccount, updateWallet } = appSlice.actions;
+export const { setActiveNetwork, setActiveAccount, setActiveWalletType, setActiveWalletIdx, updateAccount, removeAccount, updateWallet } = appSlice.actions;
 export default appSlice.reducer;

@@ -44,7 +44,7 @@ export function AccountDropdown({
                <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                          <div className="flex items-center gap-2 cursor-pointer">
-                              <Avatar className="h-10 w-10">
+                              <Avatar className="h-10 w-10">     
                                    <AvatarFallback className="flex items-center justify-center text-sm font-semibold leading-none bg-muted text-foreground hover:bg-accent transition">
                                         {activeAccount
                                              ? getInitials(activeAccount.name)
@@ -58,7 +58,7 @@ export function AccountDropdown({
                          </div>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent className="w-64" align="start">
+                    <DropdownMenuContent className="w-54 sm:w-64" align="start">
                          <DropdownMenuGroup>
                               {accounts?.map(account => {
                                    const isActive = account.accountIdx === activeAccountIdx;

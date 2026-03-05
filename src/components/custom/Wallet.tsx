@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect, useState } from "react";
-import { fetchBalance, fetchSignatures, setActiveNetwork, type networkType, type Wallet } from "@/slices/appSlice";
+import { fetchBalance, fetchSignatures, type networkType, type Wallet } from "@/slices/appSlice";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
@@ -104,10 +104,6 @@ export default function Wallet({
      return (
           <div className="max-w-4xl mx-auto px-5 sm:px-6 py-8 sm:py-10">
 
-               <div className="flex gap-2">
-                    <Button onClick={() => dispatch(setActiveNetwork('MAINNET'))}>MAINNET</Button>
-                    <Button onClick={() => dispatch(setActiveNetwork('DEVNET'))}>DEVNET</Button>
-               </div>
                <Tabs defaultValue="tokens" className="w-full">
                     {/* Tabs */}
                     <div className="flex justify-center mb-10 sm:mb-12">
@@ -192,8 +188,10 @@ export default function Wallet({
                                                   <TableHead className="h-14 px-4 sm:px-6 font-medium text-lg text-accent-foreground/90">
                                                        Transaction History
                                                   </TableHead>
-                                                  <TableHead></TableHead>
-                                                  <TableHead></TableHead>
+                                                  {!!signatures.length && <>
+                                                       <TableHead></TableHead>
+                                                       <TableHead></TableHead>
+                                                  </>}
                                                   <TableHead className="h-14 px-4 w-30 sm:px-6">
                                                        <button
                                                             aria-label="Refresh balance"
@@ -226,7 +224,6 @@ export default function Wallet({
 
                                         <TableBody>
                                              {signatures?.map((s) => {
-                                                  // Truncate signature to 50 chars visible + ...
                                                   const displaySig =
                                                        s.signature.length > 48
                                                             ? `${s.signature.slice(0, 48)}...`

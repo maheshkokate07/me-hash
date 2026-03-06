@@ -101,6 +101,10 @@ export default function Header({
 
                {/* Right */}
                <div className="flex items-center justify-end gap-2.5 flex-1 h-10">
+                    {/* <Badge variant="destructive" className="flex items-center h-6 gap-1.5">
+                         <CircleAlert />
+                         Test mode
+                    </Badge> */}
                     {/* <ThemeToggle /> */}
                     <SettingsPanel headerHeight={headerHeight} />
                </div>

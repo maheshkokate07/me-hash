@@ -52,7 +52,7 @@ export default function SettingsPanel({ headerHeight }: { headerHeight: string }
                                    <ThemeToggle />
                                    <SheetClose asChild>
                                         <Button variant="ghost" className="h-10 cursor-pointer">
-                                             <X className="scale-115 sm:scale-130" />
+                                             <X className="scale-115 sm:scale-130 opacity-90" />
                                         </Button>
                                    </SheetClose>
                               </div>

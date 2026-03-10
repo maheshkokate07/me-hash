@@ -3,43 +3,30 @@ import {
      Sheet,
      SheetClose,
      SheetContent,
-     // SheetDescription,
-     SheetFooter,
+     // SheetFooter,
      SheetHeader,
      SheetTitle,
      SheetTrigger,
 } from "@/components/ui/sheet"
-import { CircleAlert, Dot, Settings } from "lucide-react"
+import { AlertCircle, ArrowUpRight, Dot, Settings, X } from "lucide-react"
 import { Switch } from "../ui/switch"
 import { useEffect, useState } from "react"
-import { useTheme } from "@/providers/ThemeProvider"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { setActiveNetwork } from "@/slices/appSlice"
-import { Badge } from "../ui/badge"
 import { toast } from "sonner"
+import { Separator } from "../ui/separator"
+import { ThemeToggle } from "./ThemeToggle"
 
 export default function SettingsPanel({ headerHeight }: { headerHeight: string }) {
      const dispatch = useAppDispatch();
 
      const { activeNetwork } = useAppSelector(state => state.app);
 
-     const { theme, setTheme } = useTheme()
-     const [isDarkMode, setIsDarkMode] = useState(false);
      const [isDevMode, setIsDevMode] = useState(false);
-
-     // Sync switch with current theme
-     useEffect(() => {
-          setIsDarkMode(theme === "dark")
-     }, [theme])
 
      useEffect(() => {
           setIsDevMode(activeNetwork === 'DEVNET');
      }, [activeNetwork]);
-
-     const handleThemeChange = (value: boolean) => {
-          setIsDarkMode(value)
-          setTheme(value ? "dark" : "light")
-     }
 
      const handleNetworkChange = (value: boolean) => {
           setIsDevMode(value);
@@ -61,29 +48,61 @@ export default function SettingsPanel({ headerHeight }: { headerHeight: string }
                     <SheetHeader className="border-b flex justify-center" style={{ height: headerHeight }}>
                          <SheetTitle className="text-lg flex items-center justify-between">
                               App settings
-                              {activeNetwork === 'DEVNET' && <Badge variant="destructive" className="flex items-center gap-1">
-                                   <CircleAlert style={{ marginTop: '1px' }} />
-                                   Test mode
-                              </Badge>}
+                              <div className="flex items-center gap-2">
+                                   <ThemeToggle />
+                                   <SheetClose asChild>
+                                        <Button variant="ghost" className="h-10 cursor-pointer">
+                                             <X className="scale-115 sm:scale-130" />
+                                        </Button>
+                                   </SheetClose>
+                              </div>
                          </SheetTitle>
-                         {/* <SheetDescription>
-                              Make changes to your profile here. Click save when you&apos;re done.
-                         </SheetDescription> */}
                     </SheetHeader>
-                    <div className="grid flex-1 auto-rows-min gap-4 px-4">
-                         <div className="flex items-center justify-between">
+                    {activeNetwork === 'DEVNET' && <div className="bg-destructive/30 w-full text-sm -mt-4 h-10 flex gap-2 px-4 items-center">
+                         <AlertCircle size="14" />
+                         <span className="mb-0.5">
+                              You're in test mode
+                         </span>
+                    </div>}
+
+                    <div className="flex-1 flex flex-col gap-4">
+                         <div className="grid auto-rows-min gap-3 px-4">
+                              <span className="text-muted-foreground text-xs -mt-1.5">
+                                   Devnet faucets
+                              </span>
+                              <a
+                                   href="https://faucet.solana.com"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="group text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-10 px-4 flex items-center justify-between gap-2"
+                              >
+                                   Solana faucet
+                                   <ArrowUpRight size="16" className="transition group-hover:translate-x-0.5" />
+                              </a>
+                              <a
+                                   href="https://cloud.google.com/application/web3/faucet/ethereum/sepolia"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="group text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-10 px-4 flex items-center justify-between gap-2"
+                              >
+                                   Ethereum faucet
+                                   <ArrowUpRight size="16" className="transition group-hover:translate-x-0.5" />
+                              </a>
+                         </div>
+                         {/* <Separator /> */}
+                    </div>
+
+                    <div className="grid auto-rows-min gap-3 px-4">
+                         <div className="flex font-medium items-center justify-between">
                               Developer mode <Switch checked={isDevMode} onCheckedChange={handleNetworkChange} className="panel-switch" />
                          </div>
-                         <div className="flex items-center justify-between">
-                              Dark theme <Switch checked={isDarkMode} onCheckedChange={handleThemeChange} className="panel-switch" />
-                         </div>
                     </div>
-                    <SheetFooter>
-                         {/* <Button type="submit">Save changes</Button> */}
+                    <Separator />
+                    {/* <SheetFooter>
                          <SheetClose asChild>
                               <Button variant="outline">Close</Button>
                          </SheetClose>
-                    </SheetFooter>
+                    </SheetFooter> */}
                </SheetContent>
           </Sheet>
      )

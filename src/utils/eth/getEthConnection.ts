@@ -1,11 +1,17 @@
 import { ethers } from "ethers";
 import type { networkType } from "@/slices/appSlice";
 
-export const getEthConnection = (network: networkType) => {
-     const rpcUrl =
-          network === "MAINNET"
-               ? import.meta.env.VITE_ETH_API_MAINNET
-               : import.meta.env.VITE_ETH_API_DEVNET;
+let mainnetConnection: ethers.JsonRpcProvider | null = null;
+let devnetConnection: ethers.JsonRpcProvider | null = null;
 
-     return new ethers.JsonRpcProvider(rpcUrl);
-};
+export const getEthConnection = (network: networkType) => {
+     if (network === 'MAINNET') {
+          if (!mainnetConnection)
+               mainnetConnection = new ethers.JsonRpcProvider(import.meta.env.VITE_ETH_API_MAINNET);
+          return mainnetConnection;
+     } else {
+          if (!devnetConnection)
+               devnetConnection = new ethers.JsonRpcProvider(import.meta.env.VITE_ETH_API_DEVNET);
+          return devnetConnection;
+     }
+}

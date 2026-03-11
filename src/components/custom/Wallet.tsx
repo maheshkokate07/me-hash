@@ -197,7 +197,7 @@ export default function Wallet({
                                                             aria-label="Refresh balance"
                                                             disabled={!canRefetchSignatures || refetchingSignatures}
                                                             onClick={refetchSignatures}
-                                                            className="flex items-center disabled:opacity-70 disabled:cursor-not-allowed rounded-[3px] bg-accent hover:bg-transparent transition cursor-pointer text-accent-foreground/90 px-2.5 py-1.5 border gap-1.5 text-xs group ">
+                                                            className="flex items-center disabled:opacity-70 disabled:cursor-not-allowed rounded-[3px] bg-accent hover:bg-transparent disabled:hover:bg-accent transition cursor-pointer text-accent-foreground/90 px-2.5 py-1.5 border gap-1.5 text-xs group ">
                                                             {canRefetchSignatures ?
                                                                  <RefreshCcw size="12" className={`${refetchingSignatures && 'animate-spin'}`} /> :
                                                                  <Timer size="13" />

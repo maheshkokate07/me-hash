@@ -66,15 +66,18 @@ export default function SettingsPanel({ headerHeight }: { headerHeight: string }
                     </div>}
 
                     <div className="flex-1 flex flex-col gap-4">
-                         <div className="grid auto-rows-min gap-3 px-4">
-                              <span className="text-muted-foreground text-xs -mt-1.5">
-                                   Devnet faucets
+                         <div className="grid auto-rows-min gap-2.5 px-4">
+                              <span className="text-muted-foreground text-xs -mt-1.5 mb-0.5">
+                                   Developer settings
                               </span>
+                              <div onClick={() => handleNetworkChange(!isDevMode)} className="text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-11 px-4 flex items-center justify-between">
+                                   Developer mode <Switch checked={isDevMode} onCheckedChange={handleNetworkChange} className="panel-switch cursor-pointer" />
+                              </div>
                               <a
                                    href="https://faucet.solana.com"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   className="group text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-10 px-4 flex items-center justify-between gap-2"
+                                   className="group text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-11 px-4 flex items-center justify-between"
                               >
                                    Solana faucet
                                    <ArrowUpRight size="16" className="transition group-hover:translate-x-0.5" />
@@ -83,7 +86,7 @@ export default function SettingsPanel({ headerHeight }: { headerHeight: string }
                                    href="https://cloud.google.com/application/web3/faucet/ethereum/sepolia"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   className="group text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-10 px-4 flex items-center justify-between gap-2"
+                                   className="group text-sm font-medium cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md h-11 px-4 flex items-center justify-between"
                               >
                                    Ethereum faucet
                                    <ArrowUpRight size="16" className="transition group-hover:translate-x-0.5" />
@@ -93,9 +96,7 @@ export default function SettingsPanel({ headerHeight }: { headerHeight: string }
                     </div>
 
                     <div className="grid auto-rows-min gap-3 px-4">
-                         <div className="flex font-medium items-center justify-between">
-                              Developer mode <Switch checked={isDevMode} onCheckedChange={handleNetworkChange} className="panel-switch" />
-                         </div>
+
                     </div>
                     <Separator />
                     {/* <SheetFooter>

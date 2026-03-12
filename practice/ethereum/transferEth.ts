@@ -47,8 +47,8 @@ export const confirmEthTransaction = async (txHash: string) => {
 const main = async () => {
     try {
         const signature = await sendEthTransaction(
-            "0x13be8eb9baa781f768453102f5f1a2e5b37e7544f3efca6da7a99bdb13e3ed5c",
-            "0x0e0f2638bB4cECe3B8beBe92C362b71C9DeB90E9",
+            "",
+            "",
             0.001,
         );
         console.log("Tx sent: ", signature);

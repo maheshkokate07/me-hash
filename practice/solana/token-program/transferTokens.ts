@@ -63,7 +63,7 @@ export const transferTokens = async (
 
 const main = async () => {
      try {
-          const signature = await transferTokens("274623952d2af09a05e4ba53e42f9cc4941cc5431774f173c390cf3f6415fd050a07b09851a03f88b19dda05a67c701a08c4947482b65a2521ab0bdebe79265f", "FT451WyLdmmWBfrVDD3L7ABbm6XXhb9ope3vhHLG8tcP", "EQ7BsKyJizYRyuok7Zwjk9eEoADVmiTJczmF8sEXxAnH", 110);
+          const signature = await transferTokens("", "", "", 110);
           console.log("Signature: ", signature);
      } catch (err) {
           console.error("Error: ", err);

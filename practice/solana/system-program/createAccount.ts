@@ -39,7 +39,7 @@ export const createAccount = async (payerPrivatekey: string) => {
 
 const main = async () => {
      try {
-          const signature = await createAccount("8feb6e8a7ffd25d47f402b39a6c39efec6209908b98b87d4f6438d901fa2fbee361e8eb551f930f784ae951b15c7f39232f78e00d38da2acbb63c445aef48df3");
+          const signature = await createAccount("");
           console.log("Signature: ", signature);
      } catch (err) {
           console.error("Error: ", err);

@@ -45,7 +45,7 @@ export const createATA = async (payerPrivateKey: string, mintAddress: string) =>
 
 const main = async () => {
      try {
-          const { signature, ata } = await createATA("0702f994476a44a848de76741dbadcf5dc298698535bcd4527746f3eaf9c7ef0d6b0303264c616903d393c18ac874ba020170e8aeede21de56a29761dc075918", "EQ7BsKyJizYRyuok7Zwjk9eEoADVmiTJczmF8sEXxAnH");
+          const { signature, ata } = await createATA("", "");
           console.log("Signature: ", signature);
           console.log("ATA: ", ata);
      } catch (err) {

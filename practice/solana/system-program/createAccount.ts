@@ -1,7 +1,7 @@
 import { Connection, Keypair, LAMPORTS_PER_SOL, sendAndConfirmTransaction, SystemProgram, Transaction } from "@solana/web3.js";
 import { getSolanaKeypair } from "../utils/getSolanaKeypair.ts";
 
-export const solConnection = new Connection("https://solana-devnet.g.alchemy.com/v2/FkBMdsbA442d5NhwxjyRg", "confirmed");
+export const solConnection = new Connection("https://api.devnet.solana.com", "confirmed");
 
 export const createAccount = async (payerPrivatekey: string) => {
      try {

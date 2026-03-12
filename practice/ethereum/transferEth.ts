@@ -1,12 +1,12 @@
 import { ethers } from "ethers";
 import { getEthereumWallet } from "./utils/getEthereumWallet.ts";
 
-export const ethConnection = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/1d7ad012aa924b439042cb9256b5890c");
+export const ethConnection = new ethers.JsonRpcProvider("");
 
-export const transferEth = async (
+export const sendEthTransaction = async (
     payerPrivatekey: string,
     toPublicKay: string,
-    amount: number
+    amount: number,
 ) => {
     try {
         // Get Ethereum wallet from payer's private key
@@ -25,11 +25,8 @@ export const transferEth = async (
             gasLimit: estimatedGas
         }
 
-        // Sent transaction
+        // Send transaction
         const transaction = await wallet.sendTransaction(tx);
-
-        // Wait for transaction confirmation
-        await transaction.wait();
 
         return transaction.hash;
     } catch (err) {
@@ -37,10 +34,27 @@ export const transferEth = async (
     }
 }
 
+export const confirmEthTransaction = async (txHash: string) => {
+    try {
+        // Wait for transaction confirmation
+        const receipt = await ethConnection.waitForTransaction(txHash)
+        return receipt;
+    } catch (err) {
+        throw err;
+    }
+}
+
 const main = async () => {
     try {
-        const signature = await transferEth("0x13be8eb9baa781f768453102f5f1a2e5b37e7544f3efca6da7a99bdb13e3ed5c", "0x0e0f2638bB4cECe3B8beBe92C362b71C9DeB90E9", 0.001);
-        console.log("Signature: ", signature);
+        const signature = await sendEthTransaction(
+            "0x13be8eb9baa781f768453102f5f1a2e5b37e7544f3efca6da7a99bdb13e3ed5c",
+            "0x0e0f2638bB4cECe3B8beBe92C362b71C9DeB90E9",
+            0.001,
+        );
+        console.log("Tx sent: ", signature);
+
+        const receipt = await confirmEthTransaction(signature);
+        console.log("Tx confirmed: ", receipt);
     } catch (err) {
         console.log("Error: ", err);
     }

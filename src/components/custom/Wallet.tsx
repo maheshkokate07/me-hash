@@ -275,12 +275,13 @@ export default function Wallet({
                                                                       ? (() => {
                                                                            const dt = new Date(s.blockTime * 1000);
 
-                                                                           const month = dt.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
-                                                                           const day = dt.getUTCDate();                  // number → no zero-pad needed
-                                                                           const year = dt.getUTCFullYear();
-                                                                           const hours = dt.getUTCHours().toString().padStart(2, "0");
-                                                                           const minutes = dt.getUTCMinutes().toString().padStart(2, "0");
-                                                                           const seconds = dt.getUTCSeconds().toString().padStart(2, "0");
+                                                                           const month = dt.toLocaleString("en-IN", { month: "short" });
+                                                                           const day = dt.getDate();
+                                                                           const year = dt.getFullYear();
+
+                                                                           const hours = dt.getHours().toString().padStart(2, "0");
+                                                                           const minutes = dt.getMinutes().toString().padStart(2, "0");
+                                                                           const seconds = dt.getSeconds().toString().padStart(2, "0");
 
                                                                            return `${month} ${day}, ${year} at ${hours}:${minutes}:${seconds}`;
                                                                       })()

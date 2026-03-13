@@ -18,7 +18,7 @@ export async function getEthBalance(
 
           return {
                balance: balanceEth,
-               balanceUsd: balanceEth * ethPriceUsd,
+               priceUsd: ethPriceUsd,
           };
      } catch (err) {
           throw err;

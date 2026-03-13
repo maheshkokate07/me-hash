@@ -7,6 +7,10 @@ import { getEthBalance } from "@/utils/eth/getEthBalance";
 import { getSolBalance } from "@/utils/sol/getSolBalance";
 import { getSolSignatures } from "@/utils/sol/getSolSignatures";
 import { getEthSignatures } from "@/utils/eth/getEthSignatures";
+import { isValidEthAddress } from "@/utils/eth/isValidEthAddress";
+import { isValidSolAddress } from "@/utils/sol/isValidSolAddress";
+import { sendEthTransaction } from "@/utils/eth/transferEth";
+import { sendSolTransaction } from "@/utils/sol/transferSol";
 
 type walletType = 'SOL' | 'ETH';
 export type networkType = "MAINNET" | "DEVNET";
@@ -15,7 +19,7 @@ export interface Signature {
     blockTime?: number | null | undefined,
     confirmationStatus?: string | undefined,
     signature: string,
-    slot: number
+    slot: number | null
 }
 
 export interface Wallet {
@@ -28,7 +32,6 @@ export interface Wallet {
 
     MAINNET: {
         balance: number;
-        balanceUsd: number;
         lastBalanceFetched: number;
         signatures: Signature[]
         lastSignaturesFetched: number;
@@ -36,7 +39,6 @@ export interface Wallet {
 
     DEVNET: {
         balance: number;
-        balanceUsd: number;
         lastBalanceFetched: number;
         signatures: Signature[]
         lastSignaturesFetched: number;
@@ -59,6 +61,8 @@ interface AppState {
     activeWalletType: walletType;
     activeWalletIdx: number;
     activeNetwork: networkType;
+    solPriceUsd: number | null;
+    ethPriceUsd: number | null;
 }
 
 const initialState: AppState = {
@@ -66,7 +70,9 @@ const initialState: AppState = {
     activeAccountIdx: -1,
     activeWalletType: 'ETH',
     activeWalletIdx: -1,
-    activeNetwork: "MAINNET"
+    activeNetwork: "MAINNET",
+    solPriceUsd: null,
+    ethPriceUsd: null
 }
 
 export const createAccount = createAsyncThunk(
@@ -213,7 +219,7 @@ export const fetchBalance = createAsyncThunk(
                 walletType,
                 walletAddress,
                 balance: balanceData?.balance,
-                balanceUsd: balanceData?.balanceUsd,
+                priceUsd: balanceData?.priceUsd,
                 lastBalanceFetched: Date.now()
             }
         } catch (err) {
@@ -248,6 +254,100 @@ export const fetchSignatures = createAsyncThunk(
             }
         } catch (err) {
             return rejectWithValue("Failed to fetch signatures.");
+        }
+    }
+)
+
+export const sendTransferNativeTx = createAsyncThunk(
+    "app/sendTransferNativeTx",
+    async (payload: {
+        accountIdx: number,
+        walletType: walletType,
+        walletAddress: string,
+        toPubKey: string,
+        amount: number
+    }, { getState, rejectWithValue }) => {
+        const { accountIdx, walletType, walletAddress, toPubKey, amount } = payload;
+
+        const state = getState() as { app: AppState };
+        const { accounts, activeNetwork } = state.app;
+
+        const account = accounts.find(a => a.accountIdx === accountIdx);
+
+        if (!account)
+            return rejectWithValue("Account not found.")
+
+        if (walletType === 'ETH') {
+            if (!isValidEthAddress(toPubKey))
+                return rejectWithValue("Inavlid Ethereum address.");
+
+            const wallet = account.ethWallets.find(w => w.address === walletAddress);
+
+            if (!wallet)
+                return rejectWithValue("Wallet not found.");
+
+            try {
+                const { signature, totalDeductedEth } = await sendEthTransaction(
+                    wallet.privateKey,
+                    toPubKey,
+                    amount,
+                    activeNetwork
+                );
+                const txSignature: Signature = {
+                    signature,
+                    slot: null,
+                    confirmationStatus: "pending",
+                    blockTime: Date.now() / 1000
+                }
+                return {
+                    activeNetwork,
+                    accountIdx,
+                    walletAddress,
+                    walletType,
+                    signature: txSignature,
+                    totalDeducted: totalDeductedEth,
+                };
+            } catch (err) {
+                return rejectWithValue(err);
+            }
+
+        } else if (walletType === 'SOL') {
+            if (!isValidSolAddress(toPubKey)) {
+                return rejectWithValue("Invalid Solana address.")
+            }
+
+            const wallet = account.solWallets.find(w => w.address === walletAddress);
+
+            if (!wallet)
+                return rejectWithValue("Wallet not found.");
+
+            try {
+                const { signature, totalDeductedSol } = await sendSolTransaction(
+                    wallet.privateKey,
+                    toPubKey,
+                    amount,
+                    activeNetwork
+                );
+                const txSignature: Signature = {
+                    signature,
+                    slot: null,
+                    confirmationStatus: "pending",
+                    blockTime: Date.now() / 1000
+                }
+                return {
+                    activeNetwork,
+                    accountIdx,
+                    walletAddress,
+                    walletType,
+                    signature: txSignature,
+                    totalDeducted: totalDeductedSol,
+                };
+            } catch (err) {
+                return rejectWithValue(err);
+            }
+
+        } else {
+            return rejectWithValue("Invalid wallet type.");
         }
     }
 )
@@ -423,10 +523,13 @@ const appSlice = createSlice({
 
                 state.activeAccountIdx = accountIdx;
                 state.activeWalletIdx = 0;
+
+                state.ethPriceUsd = wallets.ethPriceUsd ?? state.ethPriceUsd;
+                state.solPriceUsd = wallets.solPriceUsd ?? state.solPriceUsd;
             })
             .addCase(fetchBalance.fulfilled, (state, action) => {
                 if (!action.payload) return;
-                const { activeNetwork, walletType, walletAddress, balance, balanceUsd, lastBalanceFetched } = action.payload;
+                const { activeNetwork, walletType, walletAddress, balance, priceUsd, lastBalanceFetched } = action.payload;
 
                 for (let account of state.accounts) {
                     const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
@@ -434,10 +537,15 @@ const appSlice = createSlice({
                     for (let wallet of wallets) {
                         if (wallet.address === walletAddress) {
                             wallet[activeNetwork].balance = balance ?? 0;
-                            wallet[activeNetwork].balanceUsd = balanceUsd ?? 0;
                             wallet[activeNetwork].lastBalanceFetched = lastBalanceFetched;
                         }
                     }
+                }
+
+                if (walletType === 'ETH') {
+                    state.ethPriceUsd = priceUsd ?? state.ethPriceUsd;
+                } else if (walletType === 'SOL') {
+                    state.solPriceUsd = priceUsd ?? state.solPriceUsd;
                 }
             })
             .addCase(fetchSignatures.fulfilled, (state, action) => {
@@ -452,6 +560,22 @@ const appSlice = createSlice({
                             wallet[activeNetwork].signatures = signatures || [];
                             wallet[activeNetwork].lastSignaturesFetched = lastSignaturesFetched;
                         }
+                    }
+                }
+            })
+            .addCase(sendTransferNativeTx.fulfilled, (state, action) => {
+                if (!action.payload) return;
+                const { activeNetwork, accountIdx, walletAddress, walletType, signature, totalDeducted } = action.payload;
+
+                const account = state.accounts.find(a => a.accountIdx === accountIdx);
+                if (!account) return;
+
+                const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
+
+                for (let wallet of wallets) {
+                    if (wallet.address === walletAddress) {
+                        wallet[activeNetwork].signatures.unshift(signature);
+                        wallet[activeNetwork].balance -= totalDeducted;
                     }
                 }
             })

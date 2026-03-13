@@ -16,7 +16,7 @@ const headerHeight = "68px";
 const footerHeight = "56px";
 
 export default function App() {
-  const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx, activeNetwork } = useAppSelector(state => state.app);
+  const { activeAccountIdx, accounts, activeWalletType, activeWalletIdx, activeNetwork, ethPriceUsd, solPriceUsd } = useAppSelector(state => state.app);
 
   const [addAccountOpen, setAddAccountOpen] = useState(false);
   const [updateOnly, setUpdateOnly] = useState(false);
@@ -78,13 +78,34 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header headerHeight={headerHeight} openAddAccount={openAddAccount} openUpdateAccount={openUpdateAccount} openRecoverAccount={openRecoverAccount} openShowMnemonic={openShowMnemonic} openRemoveAccount={openRemoveAccount} openAddWallet={openAddWallet} />
+      <Header
+        headerHeight={headerHeight}
+        openAddAccount={openAddAccount}
+        openUpdateAccount={openUpdateAccount}
+        openRecoverAccount={openRecoverAccount}
+        openShowMnemonic={openShowMnemonic}
+        openRemoveAccount={openRemoveAccount}
+        openAddWallet={openAddWallet}
+      />
 
       <div className="flex-1" style={{ paddingTop: headerHeight }}>
         {
           activeAccount && activeWalletIdx === -1 ?
-            <EmptyAccount headerHeight={headerHeight} footerHeight={footerHeight} activeWalletType={activeWalletType} openAddWallet={openAddWallet} /> :
-            <Wallet wallet={activeWallet} onManage={openWalletInfo} onSend={openSend} onReceive={openReceive} activeNetwork={activeNetwork} />
+            <EmptyAccount
+              headerHeight={headerHeight}
+              footerHeight={footerHeight}
+              activeWalletType={activeWalletType}
+              openAddWallet={openAddWallet}
+            /> :
+            <Wallet
+              wallet={activeWallet}
+              onManage={openWalletInfo}
+              onSend={openSend}
+              onReceive={openReceive}
+              activeNetwork={activeNetwork}
+              ethPriceUsd={ethPriceUsd}
+              solPriceUsd={solPriceUsd}
+            />
         }
       </div>
 

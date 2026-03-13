@@ -20,14 +20,12 @@ export const createEthWallet = (mnemonic: string, walletIdx: number = 0): Wallet
                path: path,
                MAINNET: {
                     balance: 0,
-                    balanceUsd: 0,
                     lastBalanceFetched: Date.now(),
                     signatures: [],
                     lastSignaturesFetched: Date.now()
                },
                DEVNET: {
                     balance: 0,
-                    balanceUsd: 0,
                     lastBalanceFetched: Date.now(),
                     signatures: [],
                     lastSignaturesFetched: Date.now()

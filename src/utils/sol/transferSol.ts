@@ -1,15 +1,18 @@
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { getSolanaKeypair } from "../utils/getSolanaKeypair.ts";
+import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { sleep } from '../../../src/utils/time/sleep.ts';
-
-export const solConnection = new Connection("https://api.devnet.solana.com", "confirmed");
+import { getSolanaKeypair } from "./getSolanaKeypair.ts";
+import type { networkType } from "@/slices/appSlice.ts";
+import { getSolConnection } from "./getSolConnection.ts";
 
 export const sendSolTransaction = async (
      payerPrivatekey: string,
      toPublicKay: string,
-     amount: number
+     amount: number,
+     activeNetwork: networkType
 ) => {
      try {
+          const solConnection = getSolConnection(activeNetwork);
+
           // Get keypair from payer's private key
           const payer = getSolanaKeypair(payerPrivatekey);
 
@@ -37,17 +40,27 @@ export const sendSolTransaction = async (
           // Attach recent blockhash to transaction
           transferTx.recentBlockhash = latestBlock.blockhash;
 
+          transferTx.feePayer = payer.publicKey;
+
+          // Estimate fee
+          const fee = (await solConnection.getFeeForMessage(transferTx.compileMessage())).value!;
+          const feeSol = fee / LAMPORTS_PER_SOL;
+
+          const totalDeductedSol = Number(amount + feeSol);
+
           // Send transaction
           const signature = await solConnection.sendTransaction(transferTx, [payer]);
 
-          return signature;
+          return { signature, totalDeductedSol };
      } catch (err) {
           throw err;
      }
 }
 
-export const confirmSolTransaction = async (signature: string) => {
+export const confirmSolTransaction = async (signature: string, activeNetwork: networkType) => {
      try {
+          const solConnection = getSolConnection(activeNetwork);
+
           // Wait for transaction confirmation
           let receipt = null;
           while (!receipt) {
@@ -61,21 +74,3 @@ export const confirmSolTransaction = async (signature: string) => {
           throw err;
      }
 }
-
-const main = async () => {
-     try {
-          const signature = await sendSolTransaction(
-               "",
-               "",
-               0.1
-          );
-          console.log("Tx sent: ", signature);
-
-          const receipt = await confirmSolTransaction(signature);
-          console.log("Tx confirmed: ", receipt);
-     } catch (err) {
-          console.log("Error: ", err);
-     }
-}
-
-main();

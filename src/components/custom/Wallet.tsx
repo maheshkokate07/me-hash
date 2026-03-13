@@ -16,22 +16,27 @@ import {
 } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect, useState } from "react";
-import { fetchBalance, fetchSignatures, type networkType, type Wallet } from "@/slices/appSlice";
+import { fetchBalance, fetchSignatures, sendTransferNativeTx, type networkType, type Wallet } from "@/slices/appSlice";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Input } from "../ui/input";
 
 export default function Wallet({
      wallet,
      onReceive,
      onSend,
      onManage,
-     activeNetwork
+     activeNetwork,
+     ethPriceUsd,
+     solPriceUsd
 }: {
      wallet: Wallet;
      onManage: () => void;
      onSend: () => void;
      onReceive: () => void;
-     activeNetwork: networkType
+     activeNetwork: networkType;
+     ethPriceUsd: number | null;
+     solPriceUsd: number | null;
 }) {
      const symbol = wallet.type === "SOL" ? "SOL" : "ETH";
 
@@ -41,8 +46,33 @@ export default function Wallet({
      const [canRefetchBalance, setCanRefetchBalance] = useState(false);
      const [canRefetchSignatures, setCanRefetchSignatures] = useState(false);
 
-     const { type, address, } = wallet;
-     const { lastBalanceFetched, signatures, lastSignaturesFetched, balanceUsd, balance } = wallet[activeNetwork];
+     // 
+     const [amount, setAmount] = useState(0);
+     const [to, setTo] = useState("");
+     const [sending, setSending] = useState(false);
+
+     const sendTx = async () => {
+          setSending(true);
+          try {
+               await dispatch(sendTransferNativeTx({
+                    accountIdx: 0,
+                    walletType: wallet.type,
+                    amount: Number(amount),
+                    toPubKey: to,
+                    walletAddress: wallet.address
+               })).unwrap();
+               toast.success("Tx sent.");
+          } catch (err) {
+               console.error("Error in sending tx: ", err);
+          } finally {
+               setSending(false);
+          }
+     }
+
+     //
+
+     const { type, address } = wallet;
+     const { lastBalanceFetched, signatures, lastSignaturesFetched, balance } = wallet[activeNetwork];
 
      const checkCanRefetchBalance = () => {
           if (lastBalanceFetched) {
@@ -65,7 +95,7 @@ export default function Wallet({
           try {
                await dispatch(
                     fetchBalance({ walletType: type, walletAddress: address })
-               );
+               ).unwrap();
                toast.success("Balance refreshed successfully.");
           } catch (err: any) {
                toast.error(err);
@@ -79,7 +109,7 @@ export default function Wallet({
           try {
                await dispatch(
                     fetchSignatures({ walletType: type, walletAddress: address })
-               );
+               ).unwrap();
                toast.success("History refreshed successfully.")
           } catch (err: any) {
                toast.error(err);
@@ -133,7 +163,15 @@ export default function Wallet({
                               <div className="text-left">
                                    <div className="flex items-center justify-center gap-2 sm:gap-3">
                                         <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-foreground">
-                                             ${balanceUsd.toFixed(2)}
+                                             {
+                                                  wallet.type === "ETH"
+                                                       ? ethPriceUsd
+                                                            ? `$${(balance * ethPriceUsd).toFixed(2)}`
+                                                            : "-"
+                                                       : solPriceUsd
+                                                            ? `$${(balance * solPriceUsd).toFixed(2)}`
+                                                            : "-"
+                                             }
                                         </h1>
                                         <Button
                                              size="icon"
@@ -175,6 +213,11 @@ export default function Wallet({
                                         label="Manage"
                                    />
                               </div>
+
+                              <Input type="number" value={amount} onChange={(e) => setAmount(+e.target.value)} />
+                              <Input type="text" value={to} onChange={(e) => setTo(e.target.value)} />
+
+                              <Button onClick={sendTx}>{sending ? 'Sending...' : 'Send'}</Button>
                          </div>
                     </TabsContent>
 
@@ -267,7 +310,7 @@ export default function Wallet({
                                                             </TableCell>
 
                                                             <TableCell className="px-4 sm:px-6 py-4 text-xs tabular-nums">
-                                                                 {s.slot.toLocaleString()}
+                                                                 {s.slot ? s.slot.toLocaleString() : "-"}
                                                             </TableCell>
 
                                                             <TableCell className="px-4 sm:px-6 py-4 text-xs tabular-nums whitespace-nowrap">

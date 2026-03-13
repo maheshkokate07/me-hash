@@ -33,7 +33,6 @@ export const importWalletsByMnemonic = async (
                if (balanceWei !== 0n) {
                     const balanceEth = Number(ethers.formatEther(balanceWei));
                     wallet[activeNetwork].balance = balanceEth;
-                    wallet[activeNetwork].balanceUsd = balanceEth * ethPriceUsd;
                     wallet[activeNetwork].signatures = await getEthSignatures(wallet.address, activeNetwork);
                     ethWallets.push(wallet);
                     zeroEth = 0;
@@ -53,7 +52,7 @@ export const importWalletsByMnemonic = async (
      // FOR SOL
      const solWallets: Wallet[] = [];
      let zeroSol: number = 0;
-     const solPrice = await getTokenPrice("SOL", "usd");
+     const solPriceUsd = await getTokenPrice("SOL", "usd");
 
      for (let i = 0; i < MAX_ACCOUNTS && zeroSol < GAP_LIMIT; i++) {
           try {
@@ -64,7 +63,6 @@ export const importWalletsByMnemonic = async (
                if (balanceLamports !== 0) {
                     const balanceSol = balanceLamports / 1e9;
                     wallet[activeNetwork].balance = balanceSol;
-                    wallet[activeNetwork].balanceUsd = balanceSol * solPrice;
                     wallet[activeNetwork].signatures = await getSolSignatures(wallet.address, activeNetwork);
                     solWallets.push(wallet);
                     zeroSol = 0;
@@ -81,5 +79,5 @@ export const importWalletsByMnemonic = async (
           solWallets.push(fallbackWallet);
      }
 
-     return { ethWallets, solWallets };
+     return { ethWallets, solWallets, ethPriceUsd, solPriceUsd };
 };

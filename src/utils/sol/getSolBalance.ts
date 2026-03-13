@@ -15,11 +15,11 @@ export async function getSolBalance(
           const balanceLamports = await solConnection.getBalance(publicKey);
           const balanceSol = balanceLamports / 1e9;
 
-          const solPrice = await getTokenPrice("SOL", currency);
+          const solPriceUsd = await getTokenPrice("SOL", currency);
 
           return {
                balance: balanceSol,
-               balanceUsd: balanceSol * solPrice,
+               priceUsd: solPriceUsd,
           };
      } catch (err) {
           throw err;

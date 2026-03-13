@@ -24,14 +24,12 @@ export const createSolWallet = (mnemonic: string, walletIdx: number = 0): Wallet
                path,
                MAINNET: {
                     balance: 0,
-                    balanceUsd: 0,
                     lastBalanceFetched: Date.now(),
                     signatures: [],
                     lastSignaturesFetched: Date.now()
                },
                DEVNET: {
                     balance: 0,
-                    balanceUsd: 0,
                     lastBalanceFetched: Date.now(),
                     signatures: [],
                     lastSignaturesFetched: Date.now()

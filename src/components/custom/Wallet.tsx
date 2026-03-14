@@ -16,10 +16,16 @@ import {
 } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect, useState } from "react";
-import { fetchBalance, fetchSignatures, sendTransferNativeTx, type networkType, type Wallet } from "@/slices/appSlice";
+import {
+     fetchBalance,
+     fetchSignatures,
+     // sendTransferNativeTx,
+     type networkType,
+     type Wallet
+} from "@/slices/appSlice";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Input } from "../ui/input";
+// import { Input } from "../ui/input";
 
 export default function Wallet({
      wallet,
@@ -47,27 +53,27 @@ export default function Wallet({
      const [canRefetchSignatures, setCanRefetchSignatures] = useState(false);
 
      // 
-     const [amount, setAmount] = useState(0);
-     const [to, setTo] = useState("");
-     const [sending, setSending] = useState(false);
+     // const [amount, setAmount] = useState(0);
+     // const [to, setTo] = useState("");
+     // const [sending, setSending] = useState(false);
 
-     const sendTx = async () => {
-          setSending(true);
-          try {
-               await dispatch(sendTransferNativeTx({
-                    accountIdx: 0,
-                    walletType: wallet.type,
-                    amount: Number(amount),
-                    toPubKey: to,
-                    walletAddress: wallet.address
-               })).unwrap();
-               toast.success("Tx sent.");
-          } catch (err) {
-               console.error("Error in sending tx: ", err);
-          } finally {
-               setSending(false);
-          }
-     }
+     // const sendTx = async () => {
+     //      setSending(true);
+     //      try {
+     //           await dispatch(sendTransferNativeTx({
+     //                accountIdx: 0,
+     //                walletType: wallet.type,
+     //                amount: Number(amount),
+     //                toPubKey: to,
+     //                walletAddress: wallet.address
+     //           })).unwrap();
+     //           toast.success("Tx sent.");
+     //      } catch (err) {
+     //           console.error("Error in sending tx: ", err);
+     //      } finally {
+     //           setSending(false);
+     //      }
+     // }
 
      //
 
@@ -214,10 +220,10 @@ export default function Wallet({
                                    />
                               </div>
 
-                              <Input type="number" value={amount} onChange={(e) => setAmount(+e.target.value)} />
+                              {/* <Input type="number" value={amount} onChange={(e) => setAmount(+e.target.value)} />
                               <Input type="text" value={to} onChange={(e) => setTo(e.target.value)} />
 
-                              <Button onClick={sendTx}>{sending ? 'Sending...' : 'Send'}</Button>
+                              <Button onClick={sendTx}>{sending ? 'Sending...' : 'Send'}</Button> */}
                          </div>
                     </TabsContent>
 

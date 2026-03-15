@@ -98,6 +98,7 @@ export default function App() {
               openAddWallet={openAddWallet}
             /> :
             <Wallet
+              activeAccountIdx={activeAccountIdx}
               wallet={activeWallet}
               onManage={openWalletInfo}
               onSend={openSend}

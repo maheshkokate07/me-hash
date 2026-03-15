@@ -69,7 +69,13 @@ export const confirmSolTransaction = async (signature: string, activeNetwork: ne
                     commitment: "confirmed"
                });
           }
-          return receipt;
+
+          return {
+               signature: receipt.transaction.signatures[0],
+               slot: Number(receipt.slot),
+               blockTime: Number(receipt.blockTime),
+               confirmationStatus: receipt.meta?.err ? "failed" : "confirmed"
+          }
      } catch (err) {
           throw err;
      }

@@ -9,10 +9,10 @@ import { getSolSignatures } from "@/utils/sol/getSolSignatures";
 import { getEthSignatures } from "@/utils/eth/getEthSignatures";
 import { isValidEthAddress } from "@/utils/eth/isValidEthAddress";
 import { isValidSolAddress } from "@/utils/sol/isValidSolAddress";
-import { sendEthTransaction } from "@/utils/eth/transferEth";
-import { sendSolTransaction } from "@/utils/sol/transferSol";
+import { confirmEthTransaction, sendEthTransaction } from "@/utils/eth/transferEth";
+import { confirmSolTransaction, sendSolTransaction } from "@/utils/sol/transferSol";
 
-type walletType = 'SOL' | 'ETH';
+export type walletType = 'SOL' | 'ETH';
 export type networkType = "MAINNET" | "DEVNET";
 
 export interface Signature {
@@ -199,8 +199,8 @@ export const recoverWallets = createAsyncThunk(
 
 export const fetchBalance = createAsyncThunk(
     "app/fetchBalance",
-    async (payload: { walletType: walletType, walletAddress: string }, { getState, rejectWithValue }) => {
-        const { walletType, walletAddress } = payload;
+    async (payload: { walletType: walletType, walletAddress: string, nativeOnly?: boolean }, { getState, rejectWithValue }) => {
+        const { walletType, walletAddress, nativeOnly } = payload;
 
         const state = getState() as { app: AppState };
         const { activeNetwork } = state.app;
@@ -209,9 +209,9 @@ export const fetchBalance = createAsyncThunk(
             let balanceData;
 
             if (walletType === 'ETH') {
-                balanceData = await getEthBalance(activeNetwork, walletAddress);
+                balanceData = await getEthBalance(activeNetwork, walletAddress, "usd", nativeOnly);
             } else if (walletType === 'SOL') {
-                balanceData = await getSolBalance(activeNetwork, walletAddress);
+                balanceData = await getSolBalance(activeNetwork, walletAddress, "usd", nativeOnly);
             }
 
             return {
@@ -306,11 +306,11 @@ export const sendTransferNativeTx = createAsyncThunk(
                     walletType,
                     signature: txSignature,
                     totalDeducted: totalDeductedEth,
+                    txHash: signature
                 };
             } catch (err) {
                 return rejectWithValue(err);
             }
-
         } else if (walletType === 'SOL') {
             if (!isValidSolAddress(toPubKey)) {
                 return rejectWithValue("Invalid Solana address.")
@@ -341,13 +341,54 @@ export const sendTransferNativeTx = createAsyncThunk(
                     walletType,
                     signature: txSignature,
                     totalDeducted: totalDeductedSol,
+                    txHash: signature
                 };
             } catch (err) {
                 return rejectWithValue(err);
             }
-
         } else {
             return rejectWithValue("Invalid wallet type.");
+        }
+    }
+)
+
+export const confirmTransferNativeTx = createAsyncThunk(
+    "app/confirmTransferNativeTx",
+    async (payload: {
+        accountIdx: number,
+        walletType: walletType,
+        walletAddress: string,
+        txHash: string
+    }, { getState, rejectWithValue }) => {
+        const { accountIdx, walletType, walletAddress, txHash } = payload;
+
+        const state = getState() as { app: AppState };
+        const { activeNetwork } = state.app;
+
+        if (walletType === 'ETH') {
+            const receipt = await confirmEthTransaction(txHash, activeNetwork);
+            const { balance } = await getEthBalance(activeNetwork, walletAddress, "usd", true);
+            return {
+                activeNetwork,
+                accountIdx,
+                walletType,
+                walletAddress,
+                receipt,
+                balance
+            };
+        } else if (walletType === 'SOL') {
+            const receipt = await confirmSolTransaction(txHash, activeNetwork);
+            const { balance } = await getSolBalance(activeNetwork, walletAddress, "usd", true);
+            return {
+                activeNetwork,
+                accountIdx,
+                walletType,
+                walletAddress,
+                receipt,
+                balance
+            };
+        } else {
+            return rejectWithValue('Invalid wallet type.')
         }
     }
 )
@@ -576,6 +617,36 @@ const appSlice = createSlice({
                     if (wallet.address === walletAddress) {
                         wallet[activeNetwork].signatures.unshift(signature);
                         wallet[activeNetwork].balance -= totalDeducted;
+                    }
+                }
+            })
+            .addCase(confirmTransferNativeTx.fulfilled, (state, action) => {
+                if (!action.payload) return;
+                const {
+                    activeNetwork,
+                    accountIdx,
+                    walletType,
+                    walletAddress,
+                    receipt,
+                    balance
+                } = action.payload;
+
+                const account = state.accounts.find(a => a.accountIdx == accountIdx);
+                if (!account) return;
+
+                const wallets = walletType === 'ETH' ? account.ethWallets : account.solWallets;
+
+                for (let wallet of wallets) {
+                    if (wallet.address === walletAddress) {
+                        wallet[activeNetwork].balance = balance;
+
+                        const signature = wallet[activeNetwork].signatures.find(s => s.signature === receipt.signature)
+                        if (!signature) return;
+
+                        signature.slot = receipt.slot;
+                        signature.confirmationStatus = receipt.confirmationStatus;
+                        signature.blockTime = receipt.blockTime ?? signature.blockTime;
+
                     }
                 }
             })

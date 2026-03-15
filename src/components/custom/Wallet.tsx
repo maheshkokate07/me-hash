@@ -19,15 +19,16 @@ import { useEffect, useState } from "react";
 import {
      fetchBalance,
      fetchSignatures,
-     // sendTransferNativeTx,
      type networkType,
      type Wallet
 } from "@/slices/appSlice";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 // import { Input } from "../ui/input";
+// import { useTransferNative } from "@/hooks/useTransferNative";
 
 export default function Wallet({
+     // activeAccountIdx,
      wallet,
      onReceive,
      onSend,
@@ -36,6 +37,7 @@ export default function Wallet({
      ethPriceUsd,
      solPriceUsd
 }: {
+     activeAccountIdx: number
      wallet: Wallet;
      onManage: () => void;
      onSend: () => void;
@@ -52,33 +54,25 @@ export default function Wallet({
      const [canRefetchBalance, setCanRefetchBalance] = useState(false);
      const [canRefetchSignatures, setCanRefetchSignatures] = useState(false);
 
-     // 
-     // const [amount, setAmount] = useState(0);
-     // const [to, setTo] = useState("");
-     // const [sending, setSending] = useState(false);
-
-     // const sendTx = async () => {
-     //      setSending(true);
-     //      try {
-     //           await dispatch(sendTransferNativeTx({
-     //                accountIdx: 0,
-     //                walletType: wallet.type,
-     //                amount: Number(amount),
-     //                toPubKey: to,
-     //                walletAddress: wallet.address
-     //           })).unwrap();
-     //           toast.success("Tx sent.");
-     //      } catch (err) {
-     //           console.error("Error in sending tx: ", err);
-     //      } finally {
-     //           setSending(false);
-     //      }
-     // }
-
-     //
+     // const { sendNativeTx, isSending } = useTransferNative();
 
      const { type, address } = wallet;
      const { lastBalanceFetched, signatures, lastSignaturesFetched, balance } = wallet[activeNetwork];
+
+     // const [amount, setAmount] = useState(0);
+     // const [to, setTo] = useState("");
+
+     // const handleSend = async () => {
+     //      await sendNativeTx({
+     //           accountIdx: activeAccountIdx,
+     //           walletType: type,
+     //           amount: Number(amount),
+     //           toPubKey: to,
+     //           walletAddress: address
+     //      });
+     //      toast.success("Tx sent.")
+     // };
+
 
      const checkCanRefetchBalance = () => {
           if (lastBalanceFetched) {
@@ -223,7 +217,11 @@ export default function Wallet({
                               {/* <Input type="number" value={amount} onChange={(e) => setAmount(+e.target.value)} />
                               <Input type="text" value={to} onChange={(e) => setTo(e.target.value)} />
 
-                              <Button onClick={sendTx}>{sending ? 'Sending...' : 'Send'}</Button> */}
+                              <Button onClick={handleSend}>
+                                   {
+                                        isSending ? 'Sending...' : 'Send'
+                                   }
+                              </Button> */}
                          </div>
                     </TabsContent>
 

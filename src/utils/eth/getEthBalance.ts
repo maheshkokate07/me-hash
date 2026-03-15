@@ -6,7 +6,8 @@ import { getEthConnection } from "./getEthConnection";
 export async function getEthBalance(
      activeNetwork: networkType,
      address: string,
-     currency: string = "usd"
+     currency: string = "usd",
+     nativeOnly?: boolean
 ) {
      try {
           const ethConnection = getEthConnection(activeNetwork);
@@ -14,7 +15,9 @@ export async function getEthBalance(
           const balanceWei = await ethConnection.getBalance(address);
           const balanceEth = Number(ethers.formatEther(balanceWei));
 
-          const ethPriceUsd = await getTokenPrice("ETH", currency);
+          let ethPriceUsd;
+          if (!nativeOnly)
+               ethPriceUsd = await getTokenPrice("ETH", currency);
 
           return {
                balance: balanceEth,

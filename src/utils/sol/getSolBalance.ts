@@ -6,7 +6,8 @@ import { getSolConnection } from "./getSolConnection";
 export async function getSolBalance(
      activeNetwork: networkType,
      address: string,
-     currency: string = "usd"
+     currency: string = "usd",
+     nativeOnly?: boolean
 ) {
      try {
           const solConnection = getSolConnection(activeNetwork);
@@ -15,7 +16,9 @@ export async function getSolBalance(
           const balanceLamports = await solConnection.getBalance(publicKey);
           const balanceSol = balanceLamports / 1e9;
 
-          const solPriceUsd = await getTokenPrice("SOL", currency);
+          let solPriceUsd;
+          if (!nativeOnly)
+               solPriceUsd = await getTokenPrice("SOL", currency);
 
           return {
                balance: balanceSol,

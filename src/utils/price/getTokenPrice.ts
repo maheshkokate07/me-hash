@@ -3,7 +3,7 @@ import axios from "axios";
 export async function getTokenPrice(
      tokenSymbol: 'ETH' | 'SOL',
      currency: string = 'usd'
-): Promise<number> {
+): Promise<number | null> {
      try {
           const idMap: Record<string, string> = {
                ETH: "ethereum",
@@ -17,9 +17,9 @@ export async function getTokenPrice(
                `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=${currency.toLowerCase()}`
           );
 
-          return res.data[id]?.[currency.toLowerCase()] ?? 0;
+          return res.data[id]?.[currency.toLowerCase()] ?? null;
      } catch (err) {
           console.error(`Failed to get ${tokenSymbol} price in ${currency}`, err);
-          return 0;
+          return null;
      }
 }

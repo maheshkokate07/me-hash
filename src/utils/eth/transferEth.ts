@@ -59,7 +59,13 @@ export const confirmEthTransaction = async (txHash: string, activeNetwork: netwo
 
           // Wait for transaction confirmation
           const receipt = await ethConnection.waitForTransaction(txHash)
-          return receipt;
+
+          return {
+               signature: receipt?.hash,
+               slot: Number(receipt?.blockNumber),
+               blockTime: null,
+               confirmationStatus: receipt?.status === 1 ? "confirmed" : "failed",
+          }
      } catch (err) {
           throw err;
      }

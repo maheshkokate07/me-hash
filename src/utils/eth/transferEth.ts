@@ -6,7 +6,7 @@ import type { networkType } from "@/slices/appSlice.ts";
 export const sendEthTransaction = async (
      payerPrivatekey: string,
      toPublicKay: string,
-     amount: number,
+     amount: string,
      activeNetwork: networkType
 ) => {
      try {
@@ -16,7 +16,7 @@ export const sendEthTransaction = async (
           const wallet = getEthereumWallet(payerPrivatekey).connect(ethConnection);
 
           // Convert amount to wei
-          const value = ethers.parseEther(amount.toString());
+          const value = ethers.parseEther(amount);
 
           // Get the estimated gas required for the tx to set the gas limit
           const estimatedGas = await wallet.estimateGas({

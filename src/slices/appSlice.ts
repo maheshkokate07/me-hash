@@ -11,6 +11,7 @@ import { isValidEthAddress } from "@/utils/eth/isValidEthAddress";
 import { isValidSolAddress } from "@/utils/sol/isValidSolAddress";
 import { confirmEthTransaction, sendEthTransaction } from "@/utils/eth/transferEth";
 import { confirmSolTransaction, sendSolTransaction } from "@/utils/sol/transferSol";
+// import { sleep } from "@/utils/time/sleep";
 
 export type walletType = 'SOL' | 'ETH';
 export type networkType = "MAINNET" | "DEVNET";
@@ -265,7 +266,7 @@ export const sendTransferNativeTx = createAsyncThunk(
         walletType: walletType,
         walletAddress: string,
         toPubKey: string,
-        amount: number
+        amount: string
     }, { getState, rejectWithValue }) => {
         const { accountIdx, walletType, walletAddress, toPubKey, amount } = payload;
 
@@ -308,8 +309,12 @@ export const sendTransferNativeTx = createAsyncThunk(
                     totalDeducted: totalDeductedEth,
                     txHash: signature
                 };
-            } catch (err) {
-                return rejectWithValue(err);
+            } catch (err: any) {
+                if (err.message.includes("insufficient funds")) {
+                    return rejectWithValue("Insufficient funds for transaction.");
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
             }
         } else if (walletType === 'SOL') {
             if (!isValidSolAddress(toPubKey)) {
@@ -343,8 +348,12 @@ export const sendTransferNativeTx = createAsyncThunk(
                     totalDeducted: totalDeductedSol,
                     txHash: signature
                 };
-            } catch (err) {
-                return rejectWithValue(err);
+            } catch (err: any) {
+                if (err.message.includes("insufficient lamports")) {
+                    return rejectWithValue("Insufficient funds for transaction.");
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
             }
         } else {
             return rejectWithValue("Invalid wallet type.");
@@ -367,25 +376,27 @@ export const confirmTransferNativeTx = createAsyncThunk(
 
         if (walletType === 'ETH') {
             const receipt = await confirmEthTransaction(txHash, activeNetwork);
-            const { balance } = await getEthBalance(activeNetwork, walletAddress, "usd", true);
+            // await sleep(3000);
+            // const { balance } = await getEthBalance(activeNetwork, walletAddress, "usd", true);
             return {
                 activeNetwork,
                 accountIdx,
                 walletType,
                 walletAddress,
                 receipt,
-                balance
+                // balance
             };
         } else if (walletType === 'SOL') {
             const receipt = await confirmSolTransaction(txHash, activeNetwork);
-            const { balance } = await getSolBalance(activeNetwork, walletAddress, "usd", true);
+            // await sleep(3000);
+            // const { balance } = await getSolBalance(activeNetwork, walletAddress, "usd", true);
             return {
                 activeNetwork,
                 accountIdx,
                 walletType,
                 walletAddress,
                 receipt,
-                balance
+                // balance
             };
         } else {
             return rejectWithValue('Invalid wallet type.')
@@ -628,7 +639,7 @@ const appSlice = createSlice({
                     walletType,
                     walletAddress,
                     receipt,
-                    balance
+                    // balance
                 } = action.payload;
 
                 const account = state.accounts.find(a => a.accountIdx == accountIdx);
@@ -638,7 +649,7 @@ const appSlice = createSlice({
 
                 for (let wallet of wallets) {
                     if (wallet.address === walletAddress) {
-                        wallet[activeNetwork].balance = balance;
+                        // wallet[activeNetwork].balance = balance;
 
                         const signature = wallet[activeNetwork].signatures.find(s => s.signature === receipt.signature)
                         if (!signature) return;
@@ -646,7 +657,6 @@ const appSlice = createSlice({
                         signature.slot = receipt.slot;
                         signature.confirmationStatus = receipt.confirmationStatus;
                         signature.blockTime = receipt.blockTime ?? signature.blockTime;
-
                     }
                 }
             })

@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 
-export const solConnection = new Connection("https://solana-devnet.g.alchemy.com/v2/FkBMdsbA442d5NhwxjyRg", "confirmed");
+export const solConnection = new Connection("https://api.devnet.solana.com", "confirmed");
 
 export const isValidAddress = async (publicKey: string) => {
      const pubKey = new PublicKey(publicKey);

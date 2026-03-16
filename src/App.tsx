@@ -9,8 +9,8 @@ import Wallet from "./components/custom/Wallet";
 import WalletInfoDialog from "./components/custom/WalletInfoDialog";
 import ReceiveDialog from "./components/custom/ReceiveDialog";
 import RemoveAccountDialog from "./components/custom/RemoveAccountDialog";
-import { toast } from "sonner";
 import Footer from "./components/custom/Footer";
+import TransferNativeDialog from "./components/custom/TransferNativeDialog";
 
 const headerHeight = "68px";
 const footerHeight = "56px";
@@ -27,6 +27,7 @@ export default function App() {
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
 
   const [receiveOpen, setReceiveOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
 
   const [removeAccountOpen, setRemoveAccountOpen] = useState(false);
 
@@ -61,7 +62,7 @@ export default function App() {
   const openAddWallet = () => setAddWalletOpen(true);
   const openWalletInfo = () => setWalletInfoOpen(true);
   const openReceive = () => setReceiveOpen(true);
-  const openSend = () => toast.warning("Coming soon...");
+  const openSend = () => setSendOpen(true);
 
   const openRemoveAccount = () => setRemoveAccountOpen(true);
 
@@ -128,6 +129,14 @@ export default function App() {
         onOpenChange={setAddWalletOpen}
         walletType={activeWalletType}
         accountIdx={activeAccountIdx}
+      />
+
+      <TransferNativeDialog
+        open={sendOpen}
+        onOpenChange={setSendOpen}
+        wallet={activeWallet}
+        accountIdx={activeAccountIdx}
+        tokenPriceUsd={activeWallet.type === 'ETH' ? ethPriceUsd : solPriceUsd}
       />
 
       {

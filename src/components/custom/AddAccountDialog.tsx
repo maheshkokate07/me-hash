@@ -9,7 +9,6 @@ import {
      DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAppDispatch } from "@/store/hooks";
 import { createAccount, recoverWallets, updateAccount } from "@/slices/appSlice";
@@ -17,6 +16,7 @@ import { CircleAlert, ClipboardPaste, Copy, EraserIcon, Eye, EyeOff } from "luci
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { AppSpinner } from "./Spinner";
 import { toast } from "sonner";
+import { Label } from "@radix-ui/react-label";
 
 type AddAccountDialogProps = {
      open: boolean;
@@ -177,7 +177,7 @@ export function AddAccountDialog({
                          {/* Account Name Input */}
                          {((!recoverOnly && !addOnly) || updateOnly) && (
                               <div className="grid gap-2">
-                                   <Label htmlFor="account-name">Account name</Label>
+                                   <Label htmlFor="account-name" className="">Account name</Label>
                                    <Input
                                         id="account-name"
                                         placeholder="Enter account name"

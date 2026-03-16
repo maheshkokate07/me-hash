@@ -24,11 +24,8 @@ import {
 } from "@/slices/appSlice";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-// import { Input } from "../ui/input";
-// import { useTransferNative } from "@/hooks/useTransferNative";
 
 export default function Wallet({
-     // activeAccountIdx,
      wallet,
      onReceive,
      onSend,
@@ -54,25 +51,8 @@ export default function Wallet({
      const [canRefetchBalance, setCanRefetchBalance] = useState(false);
      const [canRefetchSignatures, setCanRefetchSignatures] = useState(false);
 
-     // const { sendNativeTx, isSending } = useTransferNative();
-
      const { type, address } = wallet;
      const { lastBalanceFetched, signatures, lastSignaturesFetched, balance } = wallet[activeNetwork];
-
-     // const [amount, setAmount] = useState(0);
-     // const [to, setTo] = useState("");
-
-     // const handleSend = async () => {
-     //      await sendNativeTx({
-     //           accountIdx: activeAccountIdx,
-     //           walletType: type,
-     //           amount: Number(amount),
-     //           toPubKey: to,
-     //           walletAddress: address
-     //      });
-     //      toast.success("Tx sent.")
-     // };
-
 
      const checkCanRefetchBalance = () => {
           if (lastBalanceFetched) {
@@ -122,7 +102,6 @@ export default function Wallet({
           setCanRefetchBalance(checkCanRefetchBalance());
           setCanRefetchSignatures(checkCanRefetchSignatures());
 
-
           const interval = setInterval(() => {
                setCanRefetchBalance(checkCanRefetchBalance());
                setCanRefetchSignatures(checkCanRefetchSignatures());
@@ -130,6 +109,9 @@ export default function Wallet({
 
           return () => clearInterval(interval);
      }, [lastBalanceFetched, lastSignaturesFetched]);
+
+     const solAccUrl = `https://explorer.solana.com/address/${address}?cluster=${activeNetwork.toLowerCase()}`;
+     const ethAccUrl = `https://${activeNetwork === 'DEVNET' ? 'sepolia.' : ''}etherscan.io/address/${address}`;
 
      return (
           <div className="max-w-4xl mx-auto px-5 sm:px-6 py-8 sm:py-10">
@@ -213,15 +195,6 @@ export default function Wallet({
                                         label="Manage"
                                    />
                               </div>
-
-                              {/* <Input type="number" value={amount} onChange={(e) => setAmount(+e.target.value)} />
-                              <Input type="text" value={to} onChange={(e) => setTo(e.target.value)} />
-
-                              <Button onClick={handleSend}>
-                                   {
-                                        isSending ? 'Sending...' : 'Send'
-                                   }
-                              </Button> */}
                          </div>
                     </TabsContent>
 
@@ -232,8 +205,18 @@ export default function Wallet({
                                    <Table>
                                         <TableHeader>
                                              <TableRow className="border-b hover:bg-muted/60 bg-muted/60">
-                                                  <TableHead className="h-14 px-4 sm:px-6 font-medium text-lg text-accent-foreground/90">
-                                                       Transaction History
+                                                  <TableHead
+                                                       className="h-14 flex items-center px-4 sm:px-6 font-medium text-lg text-accent-foreground/90"
+                                                  >
+                                                       <a
+                                                            href={wallet.type === 'SOL' ? solAccUrl : ethAccUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex cursor-pointer items-center gap-1.5 group"
+                                                       >
+                                                            Transaction History
+                                                            <ArrowUpRight size={17} className="mt-1 group-hover:scale-110 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                                                       </a>
                                                   </TableHead>
                                                   {!!signatures.length && <>
                                                        <TableHead></TableHead>

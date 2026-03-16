@@ -3,11 +3,12 @@ import { sleep } from '../../../src/utils/time/sleep.ts';
 import { getSolanaKeypair } from "./getSolanaKeypair.ts";
 import type { networkType } from "@/slices/appSlice.ts";
 import { getSolConnection } from "./getSolConnection.ts";
+import BigNumber from 'bignumber.js';
 
 export const sendSolTransaction = async (
      payerPrivatekey: string,
      toPublicKay: string,
-     amount: number,
+     amount: string,
      activeNetwork: networkType
 ) => {
      try {
@@ -20,7 +21,10 @@ export const sendSolTransaction = async (
           const toPubKey = new PublicKey(toPublicKay);
 
           // Convert amount in lamports
-          const lamportsToSend = amount * LAMPORTS_PER_SOL;
+          // const lamportsToSend = amount * LAMPORTS_PER_SOL;
+
+          const lamportsBN = new BigNumber(amount).multipliedBy(LAMPORTS_PER_SOL);
+          const lamportsToSend = BigInt(lamportsBN.toFixed(0));
 
           // Create transaction
           const transferTx = new Transaction();
@@ -46,12 +50,14 @@ export const sendSolTransaction = async (
           const fee = (await solConnection.getFeeForMessage(transferTx.compileMessage())).value!;
           const feeSol = fee / LAMPORTS_PER_SOL;
 
-          const totalDeductedSol = Number(amount + feeSol);
+          const totalDeductedSol = new BigNumber(amount)
+               .plus(feeSol)
+               .toFixed(9);
 
           // Send transaction
           const signature = await solConnection.sendTransaction(transferTx, [payer]);
 
-          return { signature, totalDeductedSol };
+          return { signature, totalDeductedSol: Number(totalDeductedSol) };
      } catch (err) {
           throw err;
      }

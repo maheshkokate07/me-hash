@@ -33,7 +33,11 @@ export const importWalletsByMnemonic = async (
                if (balanceWei !== 0n) {
                     const balanceEth = Number(ethers.formatEther(balanceWei));
                     wallet[activeNetwork].balance = balanceEth;
-                    wallet[activeNetwork].signatures = await getEthSignatures(wallet.address, activeNetwork);
+                    try {
+                         wallet[activeNetwork].signatures = await getEthSignatures(wallet.address, activeNetwork);
+                    } catch (err) {
+                         wallet[activeNetwork].signatures = [];
+                    }
                     ethWallets.push(wallet);
                     zeroEth = 0;
                } else {
@@ -63,7 +67,11 @@ export const importWalletsByMnemonic = async (
                if (balanceLamports !== 0) {
                     const balanceSol = balanceLamports / 1e9;
                     wallet[activeNetwork].balance = balanceSol;
-                    wallet[activeNetwork].signatures = await getSolSignatures(wallet.address, activeNetwork);
+                    try {
+                         wallet[activeNetwork].signatures = await getSolSignatures(wallet.address, activeNetwork);
+                    } catch (err) {
+                         wallet[activeNetwork].signatures = [];
+                    }
                     solWallets.push(wallet);
                     zeroSol = 0;
                } else {

@@ -1,6 +1,6 @@
 import { Connection } from "@solana/web3.js";
 
-const solConnection = new Connection("https://solana-devnet.g.alchemy.com/v2/FkBMdsbA442d5NhwxjyRg", "confirmed");
+const solConnection = new Connection("https://api.devnet.solana.com", "confirmed");
 
 const getParsedTransactions = async (signatures: string[]) => {
      try {

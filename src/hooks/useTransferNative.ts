@@ -11,7 +11,7 @@ export const useTransferNative = () => {
     const sendNativeTx = async (payload: {
         accountIdx: number,
         walletType: walletType,
-        amount: number,
+        amount: string,
         toPubKey: string,
         walletAddress: string
     }) => {
@@ -39,7 +39,6 @@ export const useTransferNative = () => {
 
             return txData;
         } catch (err) {
-            console.error("Transaction error:", err);
             throw err;
         } finally {
             setIsSending(false);

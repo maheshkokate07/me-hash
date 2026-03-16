@@ -1,7 +1,6 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Label } from "@radix-ui/react-label";
 import { useState } from "react";
 import { AppSpinner } from "./Spinner";
 import { Button } from "../ui/button";
@@ -9,6 +8,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useAppDispatch } from "@/store/hooks";
 import { addEthWallet, addSolWallet } from "@/slices/appSlice";
 import { toast } from "sonner";
+import { Label } from "@radix-ui/react-label";
 
 type AddWalletDialogProps = {
      open: boolean;

@@ -5,9 +5,9 @@ import { Label } from "@radix-ui/react-label";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { updateWallet, type Wallet } from "@/slices/appSlice";
+import { updateWallet, type networkType, type Wallet } from "@/slices/appSlice";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Check, CircleAlert, Copy, Eye, EyeOff, Pencil } from "lucide-react";
+import { ArrowUpRight, Check, CircleAlert, Copy, Eye, EyeOff, Pencil } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ type WalletInfoDialogProps = {
      wallet: Wallet;
      open: boolean;
      onOpenChange: (open: boolean) => void;
+     activeNetwork: networkType
 };
 
 const chainLogos = {
@@ -26,6 +27,7 @@ export default function WalletInfoDialog({
      wallet,
      open,
      onOpenChange,
+     activeNetwork
 }: WalletInfoDialogProps) {
      const dispatch = useAppDispatch();
      const { activeAccountIdx, activeWalletType } = useAppSelector(
@@ -75,6 +77,9 @@ export default function WalletInfoDialog({
           setShowPrivateKey(false);
      }, [wallet]);
 
+     const solAccUrl = `https://explorer.solana.com/address/${address}?cluster=${activeNetwork.toLowerCase()}`;
+     const ethAccUrl = `https://${activeNetwork === 'DEVNET' ? 'sepolia.' : ''}etherscan.io/address/${address}`;
+
      return (
           <Dialog open={open} onOpenChange={onOpenChange}>
                <DialogContent className="sm:max-w-md">
@@ -114,7 +119,7 @@ export default function WalletInfoDialog({
                                              className="cursor-pointer h-10"
                                              onClick={toggleEditting}
                                         >
-                                             {editting ? <Check /> : <Pencil />}
+                                             {editting ? <Check className="scale-115" /> : <Pencil />}
                                         </Button>
                                    </TooltipTrigger>
                                    <TooltipContent>
@@ -136,6 +141,27 @@ export default function WalletInfoDialog({
                                    disabled
                                    className="h-10 font-mono disabled:opacity-90"
                               />
+
+                              <Tooltip>
+                                   <TooltipTrigger asChild>
+                                        <Button
+                                             variant="outline"
+                                             className="cursor-pointer h-10 flex items-center justify-center p-0"
+                                             onClick={() => copyToClipboard(address)}
+                                        >
+                                             <a
+                                                  href={type === 'SOL' ? solAccUrl : ethAccUrl}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="h-10 w-10 flex items-center justify-center rounded-md"
+                                             >
+
+                                                  <ArrowUpRight className="scale-125" />
+                                             </a>
+                                        </Button>
+                                   </TooltipTrigger>
+                                   <TooltipContent>View full details</TooltipContent>
+                              </Tooltip>
 
                               <Tooltip>
                                    <TooltipTrigger asChild>
@@ -174,7 +200,7 @@ export default function WalletInfoDialog({
                                              className="cursor-pointer h-10"
                                              onClick={toogleShowPrivateKey}
                                         >
-                                             {showPrivateKey ? <EyeOff /> : <Eye />}
+                                             {showPrivateKey ? <EyeOff className="scale-110" /> : <Eye className="scale-110" />}
                                         </Button>
                                    </TooltipTrigger>
                                    <TooltipContent>

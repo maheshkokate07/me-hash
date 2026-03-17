@@ -1,7 +1,6 @@
 import { DialogTitle } from "@radix-ui/react-dialog";
 import {
      Dialog,
-     // DialogClose,
      DialogContent,
      DialogFooter,
      DialogHeader,
@@ -54,6 +53,7 @@ export default function TransferNativeDialog({
      const [amount, setAmount] = useState("");
      const [isValidAddress, setIsValidAddress] = useState<boolean | null>(null);
      const amountInputRef = useRef<HTMLInputElement>(null);
+     const toInputRef = useRef<HTMLInputElement>(null);
 
      const shortenAddress = (addr: string) =>
           `${addr.slice(0, 4)}...${addr.slice(-4)}`;
@@ -126,6 +126,9 @@ export default function TransferNativeDialog({
           if (step === 2 && amountInputRef.current) {
                amountInputRef.current.focus();
           }
+          if (step === 1 && toInputRef.current) {
+               toInputRef.current.focus();
+          }
      }, [step]);
 
      useEffect(() => {
@@ -183,6 +186,7 @@ export default function TransferNativeDialog({
                               <div className="flex flex-col gap-2 w-full mt-8">
                                    <Label htmlFor="recipient-address">Recipient address</Label>
                                    <Input
+                                        ref={toInputRef}
                                         aria-invalid={isValidAddress === false}
                                         aria-valid={isValidAddress === true}
                                         id="recipient-address"

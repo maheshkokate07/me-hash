@@ -148,6 +148,7 @@ export default function App() {
             wallet={activeWallet}
             open={walletInfoOpen}
             onOpenChange={setWalletInfoOpen}
+            activeNetwork={activeNetwork}
           />
 
           <ReceiveDialog

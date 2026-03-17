@@ -345,7 +345,7 @@ export default function Wallet({
 function ActionButton({
      icon: Icon,
      label,
-     onClick = () => { },
+     onClick,
 }: {
      icon: React.ElementType;
      label: string;

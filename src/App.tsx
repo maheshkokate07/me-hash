@@ -131,14 +131,6 @@ export default function App() {
         accountIdx={activeAccountIdx}
       />
 
-      <TransferNativeDialog
-        open={sendOpen}
-        onOpenChange={setSendOpen}
-        wallet={activeWallet}
-        accountIdx={activeAccountIdx}
-        tokenPriceUsd={activeWallet.type === 'ETH' ? ethPriceUsd : solPriceUsd}
-      />
-
       {
         activeAccount &&
         <RemoveAccountDialog
@@ -162,6 +154,14 @@ export default function App() {
             wallet={activeWallet}
             open={receiveOpen}
             onOpenChange={setReceiveOpen}
+          />
+
+          <TransferNativeDialog
+            open={sendOpen}
+            onOpenChange={setSendOpen}
+            wallet={activeWallet}
+            accountIdx={activeAccountIdx}
+            tokenPriceUsd={activeWallet.type === 'ETH' ? ethPriceUsd : solPriceUsd}
           />
         </>
       }

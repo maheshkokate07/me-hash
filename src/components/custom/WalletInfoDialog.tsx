@@ -146,8 +146,7 @@ export default function WalletInfoDialog({
                                    <TooltipTrigger asChild>
                                         <Button
                                              variant="outline"
-                                             className="cursor-pointer h-10 flex items-center justify-center p-0"
-                                             onClick={() => copyToClipboard(address)}
+                                             className="cursor-pointer h-10 p-0"
                                         >
                                              <a
                                                   href={type === 'SOL' ? solAccUrl : ethAccUrl}

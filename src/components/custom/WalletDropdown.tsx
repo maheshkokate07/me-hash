@@ -9,8 +9,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { setActiveWalletIdx } from "@/slices/appSlice"
+import { setActiveWalletIdx, type Wallet } from "@/slices/appSlice"
 import { ChevronsUpDown, Plus } from "lucide-react"
+
+const chainLogos = {
+     ETH: "/chains/eth.svg",
+     SOL: "/chains/sol.svg",
+};
 
 export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
      const dispatch = useAppDispatch()
@@ -45,7 +50,7 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
 
                     <DropdownMenuContent className="w-64" align="start">
                          <DropdownMenuGroup>
-                              {wallets?.map((wallet: any) => {
+                              {wallets?.map((wallet: Wallet) => {
                                    const isActive = wallet.walletIdx === activeWalletIdx;
 
                                    return (
@@ -56,14 +61,18 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
                                              }
                                              className={`flex items-center gap-3 ${isActive && "bg-accent text-accent-foreground"}`}
                                         >
-                                             <Avatar className="h-9 w-9">
+                                             <Avatar className="h-8.5 w-8.5">
                                                   <AvatarFallback className="flex items-center justify-center text-xs font-semibold leading-none">
-                                                       {wallet.type}
+                                                       <img
+                                                            src={chainLogos[wallet.type]}
+                                                            alt={chainLogos[wallet.type]}
+                                                            className="h-full w-full object-cover"
+                                                       />
                                                   </AvatarFallback>
                                              </Avatar>
 
                                              <div className="flex flex-col overflow-hidden gap-0.5">
-                                                  <span className="text-sm font-medium">{`${wallet.name}`}</span>
+                                                  <span className="text-sm font-medium">{wallet.name}</span>
                                                   <span className="text-xs text-muted-foreground truncate">{wallet.address}</span>
                                              </div>
                                         </DropdownMenuItem>
@@ -80,7 +89,7 @@ export function WalletDropdown({ onAddWallet }: { onAddWallet: () => void }) {
                               }}
                               className="flex items-center gap-3 font-medium cursor-pointer"
                          >
-                              <Avatar className="h-9 w-9">
+                              <Avatar className="h-8.5 w-8.5">
                                    <AvatarFallback className="flex items-center justify-center">
                                         <Plus className="h-4 w-4" />
                                    </AvatarFallback>

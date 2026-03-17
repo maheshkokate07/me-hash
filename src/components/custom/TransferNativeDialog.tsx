@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { type Wallet } from "@/slices/appSlice";
 import { toast } from "sonner";
 import { useTransferNative } from "@/hooks/useTransferNative";
-import { ArrowLeft, CircleAlert } from "lucide-react";
+import { ArrowLeft, CircleAlert, CircleCheck } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import { isValidEthAddress } from "@/utils/eth/isValidEthAddress";
 import { isValidSolAddress } from "@/utils/sol/isValidSolAddress";
@@ -31,6 +31,11 @@ const chainLogos = {
      ETH: "/chains/eth.svg",
      SOL: "/chains/sol.svg",
 };
+
+const decimals = {
+     ETH: 18,
+     SOL: 9
+}
 
 export default function TransferNativeDialog({
      open,
@@ -79,7 +84,8 @@ export default function TransferNativeDialog({
           if (value.startsWith(".")) {
                value = "0" + value;
           }
-          if (/^\d*(\.\d{0,9})?$/.test(value)) {
+          const regex = new RegExp(`^\\d*(\\.\\d{0,${decimals[walletType]}})?$`);
+          if (regex.test(value)) {
                setAmount(value);
           }
      };
@@ -131,15 +137,27 @@ export default function TransferNativeDialog({
                     setIsValidAddress(null);
                }, 200);
           }
-     }, [open])
+     }, [open]);
+
+     useEffect(() => {
+          const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+               if (isSending) {
+                    event.preventDefault();
+               }
+          };
+          window.addEventListener("beforeunload", handleBeforeUnload);
+          return () => {
+               window.removeEventListener("beforeunload", handleBeforeUnload);
+          };
+     }, [isSending]);
 
      return (
-          <Dialog open={open} onOpenChange={onOpenChange}>
-               <DialogContent className="sm:max-w-md flex flex-col items-center">
+          <Dialog open={open} onOpenChange={isSending ? () => { } : onOpenChange}>
+               <DialogContent className="sm:max-w-md flex flex-col items-center" showCloseButton={!isSending}>
 
                     <DialogHeader className="items-center gap-3 w-full">
                          {
-                              step === 2 &&
+                              (step === 2 && !isSending) &&
                               <ArrowLeft
                                    onClick={() => setStep(1)}
                                    className="left-6 absolute top-7 opacity-70 hover:opacity-90 transition cursor-pointer rounded-full"
@@ -166,6 +184,7 @@ export default function TransferNativeDialog({
                                    <Label htmlFor="recipient-address">Recipient address</Label>
                                    <Input
                                         aria-invalid={isValidAddress === false}
+                                        aria-valid={isValidAddress === true}
                                         id="recipient-address"
                                         className="h-10"
                                         placeholder="Enter recipient address"
@@ -179,6 +198,15 @@ export default function TransferNativeDialog({
                                              <CircleAlert size={14} />
                                              <span>
                                                   Invalid address for network
+                                             </span>
+                                        </div>
+                                   }
+                                   {
+                                        isValidAddress === true &&
+                                        <div className="text-xs text-chart-2 flex items-center gap-1 -mt-0.5 ml-0.5">
+                                             <CircleCheck size={14} />
+                                             <span>
+                                                  Valid {walletType === 'ETH' ? 'Ethereum' : 'Solana'} address
                                              </span>
                                         </div>
                                    }
@@ -196,6 +224,7 @@ export default function TransferNativeDialog({
                               </div>
                               <div className="items-end justify-center mt-8">
                                    <input
+                                        disabled={isSending}
                                         ref={amountInputRef}
                                         className={`${amount.length > 17 ? 'text-2xl sm:text-3xl' : amount.length > 13 ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl'} h-12 pt-0 pb-1 font-bold text-center outline-none bg-transparent w-full`}
                                         placeholder="0"
